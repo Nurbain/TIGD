@@ -1,5 +1,4 @@
 #include "treeofshape.h"
-#include <iostream>
 
 TreeOfShape::TreeOfShape(const char *filename)
 {
@@ -14,5 +13,19 @@ TreeOfShape::TreeOfShape(const char *filename)
 
 
 void TreeOfShape::interpolate(){
+
+}
+
+void TreeOfShape::sort(){
+    std::vector<std::vector<bool>> deja_vu;
+    deja_vu.resize(interpolate_image.getSizeX());
+    for(int i=0;i<interpolate_image.getSizeX();i++){
+        deja_vu[i].resize(interpolate_image.getSizeY());
+        for(int j=0;j<interpolate_image.getSizeY();j++){
+            deja_vu[i][j] = false;
+        }
+    }
+    std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>> kjhvkdjs;
+
 
 }

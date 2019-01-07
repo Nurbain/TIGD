@@ -10,7 +10,11 @@ public:
 
     LibTIM::Image<LibTIM::U16> image;
 
+    LibTIM::Image<LibTIM::U16> interpolate_image;
+
     void interpolate();
+
+    void sort();
 };
 
 #endif // TREEOFSHAPE_H
