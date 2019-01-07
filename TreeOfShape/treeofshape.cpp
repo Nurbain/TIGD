@@ -1,16 +1,34 @@
 #include "treeofshape.h"
 
+#include <vector>
+#include <algorithm>
+
 TreeOfShape::TreeOfShape(const char *filename)
 {
-
-    if(LibTIM::Image<LibTIM::U16>::load(filename,image)){
+    if(LibTIM::Image<LibTIM::U8>::load(filename,image)){
         std::cout << "Image Load" <<std::endl;
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
     }
-
 }
 
+void TreeOfShape::medianCalcule(){
+    std::vector<U8> medianVec;
+
+    for(int i=0;i<image.getSizeX();i++){
+        medianVec.push_back(image(i,0));
+        medianVec.push_back(image(i,image.getSizeY()-1));
+    }
+
+    for(int i=1;i<image.getSizeY()-1;i++){
+        medianVec.push_back(image(0,i));
+        medianVec.push_back(image(image.getSizeX()-1,i));
+    }
+
+
+    std::nth_element(medianVec.begin(), medianVec.begin() + medianVec.size()/2, medianVec.end());
+    median = medianVec[medianVec.size()/2];
+}
 
 void TreeOfShape::interpolate(){
 
