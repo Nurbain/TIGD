@@ -5,7 +5,7 @@
 
 TreeOfShape::TreeOfShape(const char *filename)
 {
-    if(LibTIM::Image<LibTIM::U8>::load(filename,image)){
+    if(LibTIM::Image<type_pixels>::load(filename,image)){
         std::cout << "Image Load" <<std::endl;
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
@@ -13,7 +13,7 @@ TreeOfShape::TreeOfShape(const char *filename)
 }
 
 void TreeOfShape::medianCalcule(){
-    std::vector<U8> medianVec;
+    std::vector<type_pixels> medianVec;
 
     for(int i=0;i<image.getSizeX();i++){
         medianVec.push_back(image(i,0));

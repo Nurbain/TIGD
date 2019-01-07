@@ -4,16 +4,17 @@
 #include "Common/Image.h"
 
 using namespace LibTIM;
+using type_pixels = LibTIM::U8;
 
 class TreeOfShape
 {
 public:
     TreeOfShape(const char* filename);
 
-    Image<U8> image;
-    U8 median;
+    Image<type_pixels> image;
+    type_pixels median;
 
-    LibTIM::Image<LibTIM::U16> interpolate_image;
+    LibTIM::Image<type_pixels> interpolate_image;
 
     void interpolate();
 
