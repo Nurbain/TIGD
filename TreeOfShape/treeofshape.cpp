@@ -28,9 +28,54 @@ void TreeOfShape::medianCalcule(){
 
     std::nth_element(medianVec.begin(), medianVec.begin() + medianVec.size()/2, medianVec.end());
     median = medianVec[medianVec.size()/2];
+
 }
 
 void TreeOfShape::interpolate(){
+
+    interpolate_image_min.setSize(image.getSizeX()*2+3,image.getSizeY()*2+3,0);
+    interpolate_image_max.setSize(image.getSizeX()*2+3,image.getSizeY()*2+3,0);
+
+    //Fill with median in external border
+    // interpolate_image_max.size = interpolate_image_min.size
+    for(int i=0;i<interpolate_image_min.getSizeX();i++){
+        interpolate_image_min(i,0) = median;
+        interpolate_image_min(i,interpolate_image_min.getSizeY()-1) = median;
+
+        interpolate_image_max(i,0) = median;
+        interpolate_image_max(i,interpolate_image_min.getSizeY()-1) = median;
+    }
+
+    for(int i=1;i<interpolate_image_min.getSizeY()-1;i++){
+        interpolate_image_min(0,i) = median;
+        interpolate_image_min(interpolate_image_min.getSizeX()-1,i) = median;
+
+        interpolate_image_max(0,i) = median;
+        interpolate_image_max(interpolate_image_min.getSizeX()-1,i) = median;
+    }
+
+
+
+    for(int i = 0; i<image.getSizeX(); i++){
+        for(int j=0; j<image.getSizeY();j++){
+
+            //Bords image superieur
+            if(i==0){
+
+            }else if(j==image.getSizeY()-1){ //Bords image droite
+
+
+            }else if(i==image.getSizeX()-1){ //Bords image inferieur
+
+            }else if(j==0){ //bords gauche
+
+
+            }else{ //Non Bords
+
+
+            }
+        }
+    }
 
 }
 
