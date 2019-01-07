@@ -9,8 +9,7 @@ CONFIG -= app_bundle
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
-INCLUDEPATH += ../libtim/Algorithms
-INCLUDEPATH += ../libtim/Common
+INCLUDEPATH += ../libtim/
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.

@@ -1,16 +1,16 @@
 #ifndef TREEOFSHAPE_H
 #define TREEOFSHAPE_H
 
-#include "Image.h"
-
+#include "Common/Image.h"
 
 class TreeOfShape
 {
 public:
-    TreeOfShape();
+    TreeOfShape(const char* filename);
 
-    LibTIM::Image<_Float64> image;
+    LibTIM::Image<LibTIM::U16> image;
 
+    void interpolate();
 };
 
 #endif // TREEOFSHAPE_H
