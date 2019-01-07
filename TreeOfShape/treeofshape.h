@@ -19,7 +19,7 @@ public:
 
     void interpolate();
 
-    void sort();
+    void sort(LibTIM::Image<type_pixels>& result_img,std::vector<LibTIM::Point<LibTIM::TCoord>>& R);
     void medianCalcule();
 
 };
