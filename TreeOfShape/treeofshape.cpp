@@ -36,14 +36,20 @@ void TreeOfShape::interpolate(){
 
 void TreeOfShape::sort(){
     std::vector<std::vector<bool>> deja_vu;
-    deja_vu.resize(interpolate_image.getSizeX());
-    for(int i=0;i<interpolate_image.getSizeX();i++){
-        deja_vu[i].resize(interpolate_image.getSizeY());
-        for(int j=0;j<interpolate_image.getSizeY();j++){
+    deja_vu.resize(interpolate_image_min.getSizeX());
+    for(int i=0;i<interpolate_image_min.getSizeX();i++){
+        deja_vu[i].resize(interpolate_image_min.getSizeY());
+        for(int j=0;j<interpolate_image_min.getSizeY();j++){
             deja_vu[i][j] = false;
         }
     }
-    std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>> kjhvkdjs;
+    std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>> hierarchical_queue;
+    hierarchical_queue.resize(interpolate_image_max.getMax());
+
+    hierarchical_queue[interpolate_image_max(0,0)].push(LibTIM::Point<LibTIM::TCoord>(0,0));
+    deja_vu[0][0] = true;
+
+    type_pixels l = interpolate_image_max(0,0);
 
 
 }

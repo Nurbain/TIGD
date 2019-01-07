@@ -14,13 +14,13 @@ public:
     Image<type_pixels> image;
     type_pixels median;
 
-    LibTIM::Image<type_pixels> interpolate_image;
+    LibTIM::Image<type_pixels> interpolate_image_min;
+    LibTIM::Image<type_pixels> interpolate_image_max;
 
     void interpolate();
 
     void sort();
     void medianCalcule();
-    void interpolate();
 
 };
 
