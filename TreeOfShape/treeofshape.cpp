@@ -33,85 +33,96 @@ void TreeOfShape::medianCalcule(){
 
 void TreeOfShape::interpolate(){
 
-    interpolate_image_min.setSize(image.getSizeX()*2+3,image.getSizeY()*2+3,0);
-    interpolate_image_max.setSize(image.getSizeX()*2+3,image.getSizeY()*2+3,0);
+    //Nouvelle Image avec Medianne
+    Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX()+2,image.getSizeY()+2);
 
-
-    //Fill with median in external border
-    // interpolate_image_max.size = interpolate_image_min.size
-    for(int i=0;i<interpolate_image_min.getSizeX();i++){
-        interpolate_image_min(i,0) = median;
-        interpolate_image_min(i,interpolate_image_min.getSizeY()-1) = median;
-
-        interpolate_image_max(i,0) = median;
-        interpolate_image_max(i,interpolate_image_min.getSizeY()-1) = median;
+    for(int i=0;i<newImage.getSizeX();i++){
+        for(int j=0;j<newImage.getSizeY();j++){
+            if( i == 0 || j == 0 || i == newImage.getSizeX()-1 || j == newImage.getSizeY()-1)
+               newImage(i,j) = median;
+            else
+               newImage(i,j) = image(i-1,j-1);
+        }
     }
 
-    for(int i=1;i<interpolate_image_min.getSizeY()-1;i++){
-        interpolate_image_min(0,i) = median;
-        interpolate_image_min(interpolate_image_min.getSizeX()-1,i) = median;
-
-        interpolate_image_max(0,i) = median;
-        interpolate_image_max(interpolate_image_min.getSizeX()-1,i) = median;
+    image.setSize(newImage.getSizeX(),newImage.getSizeY(),1);
+    for(int i=0;i<image.getSizeX();i++){
+        for(int j=0;j<image.getSizeY();j++){
+            image(i,j) = newImage(i,j);
+        }
     }
 
+    interpolate_image_min = Image<type_pixels>(image.getSizeX()*4-1,image.getSizeY()*4-1);
+    interpolate_image_max = Image<type_pixels>(image.getSizeX()*4-1,image.getSizeY()*4-1);
 
+    //Dim 2
     for(int i = 0; i<image.getSizeX(); i++){
         for(int j=0; j<image.getSizeY();j++){
+            interpolate_image_min(i*4+1,j*4+1) = image(i,j); //From Image
+            interpolate_image_max(i*4+1,j*4+1) = image(i,j);
 
-            interpolate_image_min((i*2+3)-1,(j*2+3)-1) = image(i,j); //From Image
 
-            //Bords superieur
-            if(i==0){
-                interpolate_image_min((i*2+3)-2,(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-1) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-1) ; //Bord superieur
-                interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j)<image(i,j+1) ? image(i,j) : image(i,j+1); //Colonne basse
-                interpolate_image_min((i*2+3)-1,(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3),(j*2+3)) ? image(i,j) : interpolate_image_min((i*2+3),(j*2+3)); //Diago droite haute
-                if(j == image.getSizeY()-1){
-                    interpolate_image_min((i*2+3),(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3)+1,(j*2+3)-1) ? image(i,j) : interpolate_image_min((i*2+3)+1,(j*2+3)-1); //Ligne
-                    interpolate_image_min((i*2+3),(j*2+3)) = image(i,j)< interpolate_image_min((i*2+3)+1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)+1,(j*2+3)+1); // Diago basse
-                }else {
-
-                    interpolate_image_min((i*2+3),(j*2+3)-1) = image(i,j) < image(i+1,j) ? image(i,j) : image(i+1,j); //Ligne
-                    interpolate_image_min((i*2+3),(j*2+3)) = image(i,j)<image(i+1,j+1) ? image(i,j) : image(i+1,j+1); //Diagonnale basse
-
-                    if(j == 0){
-                        interpolate_image_min((i*2+3)-2,(j*2+3)-2) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-3) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-3) ; //Diago gauche haute
-                        interpolate_image_min((i*2+3)-2,(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-1) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-1) ; //Ligne derriere
-                    }
-                }
-
-            }else if(j==0){
-
-                interpolate_image_min((i*2+3)-2,(j*2+3)-2) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-3) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-3) ; //Diago gauche haute
-                interpolate_image_min((i*2+3)-2,(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-1) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-1) ; //Ligne derriere
-                interpolate_image_min((i*2+3),(j*2+3)-1) = image(i,j) < image(i+1,j) ? image(i,j) : image(i+1,j); //Ligne
-
-                if( i == image.getSizeX()-1){
-                    interpolate_image_min((i*2+3)-2,(j*2+3)) =  image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)+1); //Diago gauche basse
-                    interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j) < interpolate_image_min((i*2+3)-1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)-1,(j*2+3)+1); //Bord bas
-                    interpolate_image_min((i*2+3),(j*2+3)) = image(i,j) < interpolate_image_min((i*2+3)+1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)+1,(j*2+3)+1); //Diago droite basse
-                }else{
-                    interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j)<image(i,j+1) ? image(i,j) : image(i,j+1); //Colonne basse
-                    interpolate_image_min((i*2+3),(j*2+3)) = image(i,j)<image(i+1,j+1) ? image(i,j) : image(i+1,j+1); //Diagonnale basse
-                }
-            }else if( j == image.getSizeY()-1){
-                interpolate_image_min((i*2+3),(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3)+1,(j*2+3)-1) ? image(i,j) : interpolate_image_min((i*2+3)+1,(j*2+3)-1); //Ligne
-                interpolate_image_min((i*2+3),(j*2+3)) = image(i,j)< interpolate_image_min((i*2+3)+1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)+1,(j*2+3)+1); // Diago basse
-
-                if(i == image.getSizeX()-1){
-                    interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j) < interpolate_image_min((i*2+3)-1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)-1,(j*2+3)+1); //Colonne basse
-                }else{
-                    interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j)<image(i,j+1) ? image(i,j) : image(i,j+1); //Colonne basse
-                }
-            }else if( i == image.getSizeX()-1){
-                interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j) < interpolate_image_min((i*2+3)-1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)-1,(j*2+3)+1); //Bord bas
-                interpolate_image_min((i*2+3),(j*2+3)) = image(i,j) < interpolate_image_min((i*2+3)+1,(j*2+3)+1) ? image(i,j) : interpolate_image_min((i*2+3)+1,(j*2+3)+1); //Diago droite basse
-                interpolate_image_min((i*2+3),(j*2+3)-1) = image(i,j) < image(i+1,j) ? image(i,j) : image(i+1,j); //Ligne
-            }else{
-                interpolate_image_min((i*2+3),(j*2+3)-1) = image(i,j) < image(i+1,j) ? image(i,j) : image(i+1,j); //Ligne
-                interpolate_image_min((i*2+3)-1,(j*2+3)) = image(i,j)<image(i,j+1) ? image(i,j) : image(i,j+1); //Colonne basse
-                interpolate_image_min((i*2+3),(j*2+3)) = image(i,j)<image(i+1,j+1) ? image(i,j) : image(i+1,j+1); //Diagonnale basse
+            if(j !=image.getSizeY()-1 && i !=image.getSizeX()-1){
+                interpolate_image_min((i*4+3),(j*4+3)) = image(i,j) > image(i+1,j+1) ? image(i,j) : image(i+1,j+1); //Diago basse droite
+                interpolate_image_max((i*4+3),(j*4+3)) = image(i,j) > image(i+1,j+1) ? image(i,j) : image(i+1,j+1);
             }
+            if(i !=image.getSizeX()-1){
+                interpolate_image_min(i*4+3,j*4+1) = image(i,j) > image(i+1,j) ? image(i,j) : image(i+1,j); //Ligne Droite
+                interpolate_image_max(i*4+3,j*4+1) = image(i,j) > image(i+1,j) ? image(i,j) : image(i+1,j);
+            }
+            if(j !=image.getSizeY()-1){
+                interpolate_image_min(i*4+1,j*4+3) = image(i,j) > image(i,j+1) ? image(i,j) : image(i,j+1); //Colonne Basse
+                interpolate_image_max(i*4+1,j*4+3) = image(i,j) > image(i,j+1) ? image(i,j) : image(i,j+1);
+            }
+        }
+    }
+
+    //Dim 1
+    for(int i = 1; i<interpolate_image_min.getSizeX(); i=i+2){
+        for(int j=1; j<interpolate_image_min.getSizeY();j=j+2){
+
+            if(j !=interpolate_image_min.getSizeY()-2){
+                interpolate_image_min(i,j+1) = interpolate_image_min(i,j) < interpolate_image_min(i,j+2) ? interpolate_image_min(i,j) : interpolate_image_min(i,j+2); //Ligne Droite
+                interpolate_image_max(i,j+1) = interpolate_image_max(i,j) > interpolate_image_max(i,j+2) ? interpolate_image_max(i,j) : interpolate_image_max(i,j+2); //Ligne Droite
+            }
+
+            if(i !=interpolate_image_min.getSizeX()-2){
+                interpolate_image_min(i+1,j) = interpolate_image_min(i,j) < interpolate_image_min(i+2,j) ? interpolate_image_min(i,j) : interpolate_image_min(i+2,j); //Colonne Basse
+                interpolate_image_max(i+1,j) = interpolate_image_max(i,j) > interpolate_image_max(i+2,j) ? interpolate_image_max(i,j) : interpolate_image_max(i+2,j); //Colonne Basse
+            }
+        }
+    }
+
+    //Dim 1 Exterieur
+    for(int i = 0; i<interpolate_image_min.getSizeX(); i++){
+        for(int j=0; j<interpolate_image_min.getSizeY();j++){
+
+            if(i==0){
+                interpolate_image_min(i,j) = median;
+                interpolate_image_max(i,j) = median;
+            }else if(j==0){
+                interpolate_image_min(i,j) = median;
+                interpolate_image_max(i,j) = median;
+            }else if(i==interpolate_image_min.getSizeX()-1){
+                interpolate_image_min(i,j) = median;
+                interpolate_image_max(i,j) = median;
+            }else if(j==interpolate_image_min.getSizeY()-1){
+                interpolate_image_min(i,j) = median;
+                interpolate_image_max(i,j) = median;
+            }
+        }
+    }
+
+    //Dim 0
+    for(int i = 2; i<interpolate_image_min.getSizeX()-1; i=i+2){
+        for(int j=2; j<interpolate_image_min.getSizeY()-1;j=j+2){
+            type_pixels minInterval1 = std::min(interpolate_image_min(i-1,j),interpolate_image_min(i+1,j));
+            type_pixels minInterval2 = std::min(interpolate_image_min(i,j-1),interpolate_image_min(i,j+1));
+            interpolate_image_min(i,j) = std::min(minInterval1,minInterval2);
+
+            type_pixels maxInterval1 = std::max(interpolate_image_max(i-1,j),interpolate_image_max(i+1,j));
+            type_pixels maxInterval2 = std::max(interpolate_image_max(i,j-1),interpolate_image_max(i,j+1));
+            interpolate_image_max(i,j) = std::min(maxInterval1,maxInterval2);
         }
     }
 }
