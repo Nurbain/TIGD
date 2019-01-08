@@ -21,6 +21,7 @@ public:
 
     void sort(LibTIM::Image<type_pixels>& result_img,std::vector<LibTIM::Point<LibTIM::TCoord>>& R);
     std::vector<std::vector<LibTIM::Point<TCoord> > > union_find(std::vector<LibTIM::Point<LibTIM::TCoord>>& R);
+    void canonize_tree(LibTIM::Image<type_pixels>& f,std::vector<LibTIM::Point<LibTIM::TCoord>>& R,std::vector<std::vector<LibTIM::Point<TCoord> > >& parent);
 
     void medianCalcule();
 

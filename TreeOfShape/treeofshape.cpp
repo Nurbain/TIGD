@@ -255,3 +255,13 @@ std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(
     }
     return parent;
 }
+
+void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f, std::vector<LibTIM::Point<LibTIM::TCoord>>& R, std::vector<std::vector<LibTIM::Point<TCoord> > > &parent){
+    for(int i=R.size()-1;i>0;i++){
+        LibTIM::Point<LibTIM::TCoord> p = R[i];
+        LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
+        if(f(parent[q.x][q.y]) == f(q)){
+            parent[p.x][p.y] = parent[q.x][q.y];
+        }
+    }
+}
