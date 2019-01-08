@@ -181,11 +181,14 @@ void priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,Lib
 
 std::vector<LibTIM::Point<LibTIM::TCoord>> get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,LibTIM::Image<type_pixels>& im){
     std::vector<LibTIM::Point<LibTIM::TCoord>> result;
+
     for(int i=-1;i<=1;i++){
-        for(int j=-1;j<=1;j++){
-            if(p.x+i >=0 && p.x+i < im.getSizeX() && p.y+j >=0 && p.y+j < im.getSizeY())
-                result.push_back(im(p.x+i,p.y+j));
-        }
+        if(i==0)
+            continue;
+        if(p.x+i >=0 && p.x+i < im.getSizeX())
+            result.push_back(im(p.x+i,p.y));
+        if(p.y+i >=0 && p.y+i < im.getSizeY())
+            result.push_back(im(p.x,p.y+i));
     }
     return result;
 }
