@@ -210,3 +210,48 @@ void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img,std::vector<LibTIM
     }
 
 }
+
+
+LibTIM::Point<LibTIM::TCoord> find_root(std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>>& zpar,LibTIM::Point<LibTIM::TCoord>& x){
+    LibTIM::Point<LibTIM::TCoord> p = zpar[x.x][x.y];
+    if(p.x == x.x && p.y == x.y){
+        return x;
+    }
+    zpar[x.x][x.y] = find_root(zpar,x);
+    return zpar[x.x][x.y];
+}
+
+std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(std::vector<LibTIM::Point<LibTIM::TCoord>>& R){
+    std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> zpar,parent;
+    zpar.resize(interpolate_image_min.getSizeX());
+    for(int i=0;i<interpolate_image_min.getSizeX();i++){
+        zpar[i].resize(interpolate_image_min.getSizeY());
+        for(int j=0;j<interpolate_image_min.getSizeY();j++){
+            zpar[i][j] = LibTIM::Point<LibTIM::TCoord>(-1,-1);
+        }
+    }
+    parent.resize(interpolate_image_min.getSizeX());
+    for(int i=0;i<interpolate_image_min.getSizeX();i++){
+        parent[i].resize(interpolate_image_min.getSizeY());
+        for(int j=0;j<interpolate_image_min.getSizeY();j++){
+            parent[i][j] = LibTIM::Point<LibTIM::TCoord>(-1,-1);
+        }
+    }
+
+    for(int i=R.size()-1;i>0;i++){
+        LibTIM::Point<LibTIM::TCoord> p = R[i];
+        zpar[p.x][p.y] = p;
+        parent[p.x][p.y] = p;
+        std::vector<LibTIM::Point<LibTIM::TCoord>> voisins = get_voisinage(p,interpolate_image_max);
+        for(auto& n:voisins){
+            if(zpar[n.x][n.y].x != -1){
+                LibTIM::Point<LibTIM::TCoord> r =find_root(zpar,n);
+                if(p.x == r.x && p.y == r.y){
+                    zpar[r.x][r.y] = p;
+                    parent[r.x][r.y] = p;
+                }
+            }
+        }
+    }
+    return parent;
+}

@@ -20,6 +20,8 @@ public:
     void interpolate();
 
     void sort(LibTIM::Image<type_pixels>& result_img,std::vector<LibTIM::Point<LibTIM::TCoord>>& R);
+    std::vector<std::vector<LibTIM::Point<TCoord> > > union_find(std::vector<LibTIM::Point<LibTIM::TCoord>>& R);
+
     void medianCalcule();
 
 };
