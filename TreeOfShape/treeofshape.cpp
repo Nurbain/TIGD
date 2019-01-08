@@ -79,7 +79,7 @@ void TreeOfShape::interpolate(){
                         interpolate_image_min((i*2+3)-2,(j*2+3)-1) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-1) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-1) ; //Ligne derriere
                     }
                 }
-             }
+
             }else if(j==0){
 
                 interpolate_image_min((i*2+3)-2,(j*2+3)-2) = image(i,j) < interpolate_image_min((i*2+3)-3,(j*2+3)-3) ? image(i,j) : interpolate_image_min((i*2+3)-3,(j*2+3)-3) ; //Diago gauche haute
@@ -114,7 +114,6 @@ void TreeOfShape::interpolate(){
             }
         }
     }
-
 }
 
 bool is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q){
@@ -127,7 +126,7 @@ bool is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q){
     return result;
 }
 
-void next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,int& l){
+void next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
     int step = 1;
     if(is_empty(q))
         return;
@@ -144,14 +143,16 @@ void next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,int&
     }
 }
 
-LibTIM::Point<LibTIM::TCoord> priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,int& l){
+LibTIM::Point<LibTIM::TCoord> priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
     if(q[l].empty()){
         next_unempty(q,l);
     }
-    return q[l].pop();
+    LibTIM::Point<LibTIM::TCoord> result = q[l].front();
+    q[l].pop();
+    return result;
 }
 
-void priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,LibTIM::Image<type_pixels>& im_min,LibTIM::Image<type_pixels>& im_max,int& l){
+void priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,LibTIM::Image<type_pixels>& im_min,LibTIM::Image<type_pixels>& im_max,type_pixels& l){
     type_pixels lower = im_min(h);
     type_pixels upper = im_max(h);
     int l2;
@@ -196,13 +197,13 @@ void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img,std::vector<LibTIM
     type_pixels l = interpolate_image_max(0,0);
 
     while(!is_empty(hierarchical_queue)){
-        LibTIM::Point<LibTIM::TCoord> h = priority_pop(q,l);
+        LibTIM::Point<LibTIM::TCoord> h = priority_pop(hierarchical_queue,l);
         result_img(h) = l;
         R.push_back(h);
         std::vector<LibTIM::Point<LibTIM::TCoord>> voisins = get_voisinage(h,interpolate_image_max);
         for(auto& n:voisins){
             if(!deja_vu[n.x][n.y]){
-                priority_push(q,n,interpolate_image_min,interpolate_image_max,l);
+                priority_push(hierarchical_queue,n,interpolate_image_min,interpolate_image_max,l);
                 deja_vu[n.x][n.y] = true;
             }
         }
