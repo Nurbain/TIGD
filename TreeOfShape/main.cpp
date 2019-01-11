@@ -9,12 +9,10 @@ int main(int argc, char *argv[])
 
 
     TreeOfShape tree = TreeOfShape("../testInterp.pgm");
-    tree.medianCalcule();
-    tree.interpolate();
 
     tree.image.print();
-    tree.interpolate_image_min.print();
-    tree.interpolate_image_max.print();
+
+    tree.saveGraphe("../result.gv");
 
 
     return a.exec();

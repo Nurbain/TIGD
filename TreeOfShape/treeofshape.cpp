@@ -2,6 +2,10 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <sstream>
 
 TreeOfShape::TreeOfShape(const char *filename)
 {
@@ -193,9 +197,9 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> get_voisinage(LibTIM::Point<LibTIM::T
         if(i==0)
             continue;
         if(p.x+i >=0 && p.x+i < im.getSizeX())
-            result.push_back(im(p.x+i,p.y));
+            result.push_back(LibTIM::Point<LibTIM::TCoord>(p.x+i,p.y));
         if(p.y+i >=0 && p.y+i < im.getSizeY())
-            result.push_back(im(p.x,p.y+i));
+            result.push_back(LibTIM::Point<LibTIM::TCoord>(p.x,p.y+i));
     }
     return result;
 }
@@ -211,7 +215,7 @@ void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
         }
     }
     std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>> hierarchical_queue;
-    hierarchical_queue.resize(interpolate_image_max.getMax());
+    hierarchical_queue.resize(interpolate_image_max.getMax()+1);
 
     hierarchical_queue[interpolate_image_max(0,0)].push(LibTIM::Point<LibTIM::TCoord>(0,0));
     deja_vu[0][0] = true;
@@ -260,7 +264,7 @@ std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(
         }
     }
 
-    for(int i=R.size()-1;i>0;i++){
+    for(int i=R.size()-1;i>=0;i--){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         zpar[p.x][p.y] = p;
         parent[p.x][p.y] = p;
@@ -279,7 +283,7 @@ std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(
 }
 
 void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
-    for(int i=R.size()-1;i>0;i++){
+    for(int i=R.size()-1;i>=0;i--){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
         if(f(parent[q.x][q.y]) == f(q)){
@@ -290,7 +294,7 @@ void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
 
 bool TreeOfShape::is_in_image(LibTIM::Point<LibTIM::TCoord>& p){
     LibTIM::TCoord x = p.x,y=p.y;
-    if(x == 0 || y == 0){
+    if(x == 1 || y == 1){
         return false;
     }
     x-=1;
@@ -317,7 +321,7 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point
 
 
 void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
-    for(int i=R.size()-1;i>=0;i++){
+    for(int i=R.size()-1;i>=0;i--){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
             LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
@@ -335,6 +339,15 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
 
     std::vector<std::vector<LibTIM::Point<TCoord>>> parent_clean;
     std::vector<LibTIM::Point<LibTIM::TCoord>> R_clean;
+
+    parent_clean.resize(image.getSizeX());
+    for(int i=0;i<image.getSizeX();i++){
+        parent_clean[i].resize(image.getSizeY());
+        for(int j=0;j<image.getSizeY();j++){
+            parent_clean[i][j] = LibTIM::Point<LibTIM::TCoord>(-1,-1);
+        }
+    }
+
     for(int i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
@@ -345,4 +358,21 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
 
     R = R_clean;
     parent = parent_clean;
+}
+
+void TreeOfShape::saveGraphe(const std::string& path) const{
+    //On ouvre le fichier en lecture
+    std::ofstream file(path,std::ios::out | std::ios::trunc);
+
+    //Si le fichier n'est pas ouvert on quitte
+    if(file){
+        file << "strict graph {" << std::endl;
+        for(uint x=0;x<parent.size();x++){
+            for(uint y=0;y<parent[x].size();y++){
+                file << "\"(" << parent[x][y].x << "," << parent[x][y].y << ")\" -- \"(" << x << "," << y << ")\"" << std::endl;
+            }
+        }
+        file << "}" << std::endl;
+        file.close();
+    }
 }

@@ -33,6 +33,8 @@ public:
 
     void medianCalcule();
 
+    void saveGraphe(const std::string& path) const;
+
 };
 
 #endif // TREEOFSHAPE_H
