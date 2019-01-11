@@ -10,6 +10,13 @@ TreeOfShape::TreeOfShape(const char *filename)
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
     }
+    interpolate();
+    LibTIM::Image<type_pixels> result;
+    sort(result);
+    union_find();
+    canonize_tree(result);
+    un_interpolate(result);
+    std::cout << "fin construction tree" << std::endl;
 }
 
 void TreeOfShape::medianCalcule(){
@@ -194,6 +201,7 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> get_voisinage(LibTIM::Point<LibTIM::T
 }
 
 void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
+    result_img.setSize(interpolate_image_max.getSizeX(),interpolate_image_max.getSizeY(),1);
     std::vector<std::vector<bool>> deja_vu;
     deja_vu.resize(interpolate_image_min.getSizeX());
     for(int i=0;i<interpolate_image_min.getSizeX();i++){
@@ -308,12 +316,12 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point
 }
 
 
-void TreeOfShape::un_interpolate(){
-    for(int i=R.size()-1;i>0;i++){
+void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
+    for(int i=R.size()-1;i>=0;i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
             LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
-            if(!is_in_image(q)){
+            if(!is_in_image(q) && f(p) == f(q)){
                 std::vector<LibTIM::Point<LibTIM::TCoord>> freres = liste_fils(q);
                 for(auto& f:freres){
                     parent[f.x][f.y] = p;
@@ -324,4 +332,17 @@ void TreeOfShape::un_interpolate(){
 
         }
     }
+
+    std::vector<std::vector<LibTIM::Point<TCoord>>> parent_clean;
+    std::vector<LibTIM::Point<LibTIM::TCoord>> R_clean;
+    for(int i=0;i<R.size();i++){
+        LibTIM::Point<LibTIM::TCoord> p = R[i];
+        if(is_in_image(p)){
+            R_clean.push_back(p);
+            parent_clean[((p.x-1)/4)-1][((p.x-1)/4)-1] = parent[p.x][p.y];
+        }
+    }
+
+    R = R_clean;
+    parent = parent_clean;
 }

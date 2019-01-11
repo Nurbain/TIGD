@@ -29,7 +29,7 @@ public:
 
     std::vector<LibTIM::Point<LibTIM::TCoord>> liste_fils(LibTIM::Point<LibTIM::TCoord>& p);
 
-    void un_interpolate();
+    void un_interpolate(LibTIM::Image<type_pixels>& f);
 
     void medianCalcule();
 
