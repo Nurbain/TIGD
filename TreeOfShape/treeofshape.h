@@ -17,7 +17,7 @@ public:
     std::vector<std::vector<LibTIM::Point<TCoord>>> parent;
     std::vector<std::vector<int>> area;
     void saveGraphe(const std::string& path) const;
-    void removeShape(LibTIM::Point<LibTIM::TCoord>& p);
+    void removeShape(int seuil);
 
 private:
     type_pixels median;
@@ -35,6 +35,8 @@ private:
     std::vector<LibTIM::Point<LibTIM::TCoord>> liste_fils(LibTIM::Point<LibTIM::TCoord>& p);
 
     void un_interpolate(LibTIM::Image<type_pixels>& f);
+
+    type_pixels couleurParent(LibTIM::Point<TCoord>& p, int seuil);
 
 
     void compute_area();

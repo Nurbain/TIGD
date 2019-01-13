@@ -400,20 +400,34 @@ void TreeOfShape::compute_area(){
 }
 
 
-void TreeOfShape::removeShape(LibTIM::Point<TCoord> &p){
+void TreeOfShape::removeShape(int seuil){
 
     Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX(),image.getSizeY());
 
-    LibTIM::Point<LibTIM::TCoord> parentPixel = parent[p.x][p.y];
-
     for(int i=0;i<image.getSizeX();i++){
         for(int j=0;j<image.getSizeY();j++){
-            LibTIM::Point<LibTIM::TCoord> q = parent[i][j];
-            if(i == parentPixel.x && j == parentPixel.y){
-                newImage(i,j) = image(q.x,q.y);
+            if(area[i][j] < seuil){
+                LibTIM::Point<TCoord> pix = LibTIM::Point<TCoord>(i,j);
+                newImage(i,j) = couleurParent(pix,seuil);
+            }else{
+                newImage(i,j) = image(i,j);
             }
         }
     }
 
     newImage.save("/home/nathan/Documents/TIGD/resultRemoveShape.pgm");
+}
+
+type_pixels TreeOfShape::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
+
+    LibTIM::Point<TCoord> pp = parent[p.x][p.y];
+
+    if(pp.x == p.x && pp.y == p.y && area[pp.x][pp.y] < seuil ){
+        return image(pp.x,pp.y);
+    }else if( area[pp.x][pp.y] < seuil){
+        return couleurParent(pp,seuil);
+    }else{
+        return image(pp.x,pp.y);
+    }
+
 }
