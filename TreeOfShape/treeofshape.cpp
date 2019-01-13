@@ -14,6 +14,7 @@ TreeOfShape::TreeOfShape(const char *filename)
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
     }
+    medianCalcule();
     interpolate();
     LibTIM::Image<type_pixels> result;
     sort(result);
