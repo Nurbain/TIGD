@@ -10,8 +10,6 @@ int main(int argc, char *argv[])
 
     TreeOfShape tree = TreeOfShape("../testInterp.pgm");
 
-    tree.image.print();
-
     tree.saveGraphe("../result.gv");
 
 
