@@ -311,7 +311,7 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point
     for(int i=0;i<interpolate_image_min.getSizeX();i++){
         for(int j=0;j<interpolate_image_min.getSizeY();j++){
             LibTIM::Point<LibTIM::TCoord> q = parent[i][j];
-            if(i == p.x && j == q.y)
+            if(i == p.x && j == p.y)
                 continue;
             if(q.x == p.x && q.y == p.y){
                 result.push_back(LibTIM::Point<LibTIM::TCoord>(i,j));
@@ -397,5 +397,23 @@ void TreeOfShape::compute_area(){
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
         area[q.x][q.y] += area[p.x][p.y];
     }
+}
 
+
+void TreeOfShape::removeShape(LibTIM::Point<TCoord> &p){
+
+    Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX(),image.getSizeY());
+
+    LibTIM::Point<LibTIM::TCoord> parentPixel = parent[p.x][p.y];
+
+    for(int i=0;i<image.getSizeX();i++){
+        for(int j=0;j<image.getSizeY();j++){
+            LibTIM::Point<LibTIM::TCoord> q = parent[i][j];
+            if(i == parentPixel.x && j == parentPixel.y){
+                newImage(i,j) = image(q.x,q.y);
+            }
+        }
+    }
+
+    newImage.save("/home/nathan/Documents/TIGD/resultRemoveShape.pgm");
 }

@@ -9,7 +9,7 @@ class colorTreeOfShape
 public:
     colorTreeOfShape();
 
-    Image<type_pixels> Image;
+    /*Image<LibTIM::RGB> image;
 
 
     Image<type_pixels> imageR;
@@ -20,7 +20,7 @@ public:
 
     TreeOfShape treeR;
     TreeOfShape treeG;
-    TreeOfShape treeB;
+    TreeOfShape treeB;*/
 
 };
 
