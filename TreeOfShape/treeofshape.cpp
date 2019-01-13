@@ -13,13 +13,12 @@ TreeOfShape::TreeOfShape(const char *filename)
         std::cout << "Image Load" <<std::endl;
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
+        return;
     }
     medianCalcule();
     interpolate();
     LibTIM::Image<type_pixels> result;
     sort(result);
-    interpolate_image_max.print();
-    result.print();
     union_find();
     canonize_tree(result);
     un_interpolate(result);
