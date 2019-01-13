@@ -14,6 +14,7 @@ public:
     Image<type_pixels> image;
     std::vector<LibTIM::Point<LibTIM::TCoord>> R;
     std::vector<std::vector<LibTIM::Point<TCoord>>> parent;
+    std::vector<std::vector<int>> area;
     void saveGraphe(const std::string& path) const;
 
 private:
@@ -32,6 +33,8 @@ private:
     std::vector<LibTIM::Point<LibTIM::TCoord>> liste_fils(LibTIM::Point<LibTIM::TCoord>& p);
 
     void un_interpolate(LibTIM::Image<type_pixels>& f);
+
+    void compute_area();
 
     void medianCalcule();
 };

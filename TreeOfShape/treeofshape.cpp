@@ -22,6 +22,7 @@ TreeOfShape::TreeOfShape(const char *filename)
     union_find();
     canonize_tree(result);
     un_interpolate(result);
+    compute_area();
     std::cout << "fin construction tree" << std::endl;
 }
 
@@ -285,7 +286,7 @@ std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(
 }
 
 void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
-    for(int i=0;i<R.size();i++){
+    for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
         if(f(parent[q.x][q.y]) == f(q)){
@@ -323,7 +324,7 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point
 
 
 void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
-    for(int i=0;i<R.size();i++){
+    for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
             LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
@@ -352,7 +353,7 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
         }
     }
 
-    for(int i=0;i<R.size();i++){
+    for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
             R_clean.push_back(LibTIM::Point<LibTIM::TCoord>(((p.x-1)/4)-1,((p.y-1)/4)-1));
@@ -380,4 +381,21 @@ void TreeOfShape::saveGraphe(const std::string& path) const{
         file << "}" << std::endl;
         file.close();
     }
+}
+
+void TreeOfShape::compute_area(){
+    area.resize(image.getSizeX());
+    for(int i=0;i<image.getSizeX();i++){
+        area[i].resize(image.getSizeY());
+        for(int j=0;j<image.getSizeY();j++){
+            area[i][j] = 1;
+        }
+    }
+
+    for(int i=R.size()-1;i>=0;i--){
+        LibTIM::Point<LibTIM::TCoord> p = R[i];
+        LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
+        area[q.x][q.y] += area[p.x][p.y];
+    }
+
 }
