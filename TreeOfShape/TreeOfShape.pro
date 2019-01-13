@@ -19,8 +19,10 @@ INCLUDEPATH += ../libtim/
 SOURCES += \
         main.cpp \
     treeofshape.cpp \
-    gradient.cpp
+    gradient.cpp \
+    colortreeofshape.cpp
 
 HEADERS += \
     treeofshape.h \
-    gradient.h
+    gradient.h \
+    colortreeofshape.h

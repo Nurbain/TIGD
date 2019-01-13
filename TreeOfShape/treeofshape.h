@@ -9,6 +9,9 @@ using type_pixels = LibTIM::U8;
 class TreeOfShape
 {
 public:
+    TreeOfShape(){}
+    TreeOfShape(Image<type_pixels> &img);
+
     TreeOfShape(const char* filename);
 
     Image<type_pixels> image;

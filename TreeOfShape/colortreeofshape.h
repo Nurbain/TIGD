@@ -3,13 +3,14 @@
 
 #include "treeofshape.h"
 
+using namespace LibTIM;
 
 class colorTreeOfShape
 {
 public:
-    colorTreeOfShape();
+    colorTreeOfShape(const char *filename);
 
-    /*Image<LibTIM::RGB> image;
+    Image<RGB> image;
 
 
     Image<type_pixels> imageR;
@@ -20,7 +21,7 @@ public:
 
     TreeOfShape treeR;
     TreeOfShape treeG;
-    TreeOfShape treeB;*/
+    TreeOfShape treeB;
 
 };
 

@@ -26,6 +26,18 @@ TreeOfShape::TreeOfShape(const char *filename)
     std::cout << "fin construction tree" << std::endl;
 }
 
+TreeOfShape::TreeOfShape(Image<type_pixels>& img):image(img){
+    medianCalcule();
+    interpolate();
+    LibTIM::Image<type_pixels> result;
+    sort(result);
+    union_find();
+    canonize_tree(result);
+    un_interpolate(result);
+    compute_area();
+    std::cout << "fin construction tree" << std::endl;
+}
+
 void TreeOfShape::medianCalcule(){
     std::vector<type_pixels> medianVec;
 
@@ -329,18 +341,23 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
         if(is_in_image(p)){
             LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
             if(!is_in_image(q) && f(p) == f(q)){
-                std::vector<LibTIM::Point<LibTIM::TCoord>> freres = liste_fils(q);
+                LibTIM::Point<LibTIM::TCoord> tmp = parent[q.x][q.y];
+                parent[p.x][p.y] = tmp;
+                parent[q.x][q.y] = p;
+                /*std::vector<LibTIM::Point<LibTIM::TCoord>> freres = liste_fils(q);
                 for(auto& f:freres){
                     parent[f.x][f.y] = p;
                 }
                 parent[p.x][p.y] = parent[q.x][q.y];
                 if(parent[q.x][q.y].x == q.x && parent[q.x][q.y].y == q.y)
                     parent[p.x][p.y] = p;
-                parent[q.x][q.y] = q;
+                parent[q.x][q.y] = q;*/
             }
 
         }
     }
+
+    canonize_tree(f);
 
     std::vector<std::vector<LibTIM::Point<TCoord>>> parent_clean;
     std::vector<LibTIM::Point<LibTIM::TCoord>> R_clean;
