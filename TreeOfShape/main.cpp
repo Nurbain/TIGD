@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
 
     //TreeOfShape tree = TreeOfShape("/home/nathan/Documents/TIGD/test2.pgm");
-    TreeOfShape tree = TreeOfShape("../petite_bombe_atomique.pgm");
+    TreeOfShape tree = TreeOfShape("../test2.pgm");
 
     //tree.saveGraphe("/home/nathan/Documents/TIGD/result.gv");
     tree.saveGraphe("../result.gv");
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     tree.removeShape(20000);
 
-    //colorTreeOfShape c_tree("../Lena.ppm");
+    colorTreeOfShape c_tree("../test_color.ppm");
 
 
     return a.exec();

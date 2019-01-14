@@ -414,6 +414,13 @@ void TreeOfShape::compute_area(){
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
         area[q.x][q.y] += area[p.x][p.y];
     }
+
+    for(int i=R.size()-1;i>=0;i--){
+        LibTIM::Point<LibTIM::TCoord> p = R[i];
+        LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
+        if(area[p.x][p.y] == 1)
+            area[p.x][p.y] = area[q.x][q.y];
+    }
 }
 
 

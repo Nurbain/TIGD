@@ -1,4 +1,5 @@
 #include "colortreeofshape.h"
+#include "gradient.h"
 
 colorTreeOfShape::colorTreeOfShape(const char *filename)
 {
@@ -32,6 +33,30 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
     treeG = TreeOfShape(imageG);
     treeB = TreeOfShape(imageB);
 
+    Image<type_pixels> gradientR = Gradient<type_pixels>::Sobel(imageR);
+    Image<type_pixels> gradientG = Gradient<type_pixels>::Sobel(imageG);
+    Image<type_pixels> gradientB = Gradient<type_pixels>::Sobel(imageB);
+
+    imageMerge.setSize(image.getSizeX(),image.getSizeY(),1);
+    for(int i=0;i<imageMerge.getSizeX();i++){
+        for(int j=0;j<imageMerge.getSizeY();j++){
+            if(gradientR(i,j)>gradientG(i,j)){
+                if(gradientR(i,j)>gradientB(i,j)){
+                    imageMerge(i,j) = treeR.area[i][j];
+                }else{
+                    imageMerge(i,j) = treeB.area[i][j];
+                }
+            }else{
+                if(gradientG(i,j)>gradientB(i,j)){
+                    imageMerge(i,j) = treeG.area[i][j];
+                }else{
+                    imageMerge(i,j) = treeB.area[i][j];
+                }
+            }
+        }
+    }
+
+    treeMerge = TreeOfShape(imageMerge);
 
     std::cout << "fin construction color tree" << std::endl;
 }
