@@ -32,5 +32,6 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
     treeG = TreeOfShape(imageG);
     treeB = TreeOfShape(imageB);
 
+
     std::cout << "fin construction color tree" << std::endl;
 }

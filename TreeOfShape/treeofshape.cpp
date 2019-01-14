@@ -432,7 +432,7 @@ void TreeOfShape::removeShape(int seuil){
         }
     }
 
-    newImage.save("/home/nathan/Documents/TIGD/resultRemoveShape.pgm");
+    newImage.save("../resultRemoveShape.pgm");
 }
 
 type_pixels TreeOfShape::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
