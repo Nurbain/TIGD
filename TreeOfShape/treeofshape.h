@@ -42,7 +42,7 @@ private:
     type_pixels couleurParent(LibTIM::Point<TCoord>& p, int seuil);
 
 
-    void compute_area();
+    void compute_area(LibTIM::Image<type_pixels> &f);
     void medianCalcule();
 };
 

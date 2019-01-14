@@ -22,7 +22,7 @@ TreeOfShape::TreeOfShape(const char *filename)
     union_find();
     canonize_tree(result);
     un_interpolate(result);
-    compute_area();
+    compute_area(result);
     std::cout << "fin construction tree" << std::endl;
 }
 
@@ -34,7 +34,7 @@ TreeOfShape::TreeOfShape(Image<type_pixels>& img):image(img){
     union_find();
     canonize_tree(result);
     un_interpolate(result);
-    compute_area();
+    compute_area(result);
     std::cout << "fin construction tree" << std::endl;
 }
 
@@ -400,7 +400,7 @@ void TreeOfShape::saveGraphe(const std::string& path) const{
     }
 }
 
-void TreeOfShape::compute_area(){
+void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
     area.resize(image.getSizeX());
     for(int i=0;i<image.getSizeX();i++){
         area[i].resize(image.getSizeY());
@@ -418,7 +418,9 @@ void TreeOfShape::compute_area(){
     for(int i=R.size()-1;i>=0;i--){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
-        if(area[p.x][p.y] == 1)
+        LibTIM::Point<LibTIM::TCoord> tmp((p.x+1)*4+1,(p.y+1)*4+1);
+        LibTIM::Point<LibTIM::TCoord> tmp2((q.x+1)*4+1,(q.y+1)*4+1);
+        if(f(tmp) == f(tmp2))
             area[p.x][p.y] = area[q.x][q.y];
     }
 }

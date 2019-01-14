@@ -29,13 +29,56 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
         }
     }
 
+    imageR.save("../rouge.pgm");
+    imageG.save("../vert.pgm");
+    imageB.save("../bleu.pgm");
+
     treeR = TreeOfShape(imageR);
     treeG = TreeOfShape(imageG);
     treeB = TreeOfShape(imageB);
+    Gradient g;
 
-    Image<type_pixels> gradientR = Gradient<type_pixels>::Sobel(imageR);
-    Image<type_pixels> gradientG = Gradient<type_pixels>::Sobel(imageG);
-    Image<type_pixels> gradientB = Gradient<type_pixels>::Sobel(imageB);
+    Image<type_pixels> gradientR = g.Sobel(imageR);
+    Image<type_pixels> gradientG = g.Sobel(imageG);
+    Image<type_pixels> gradientB = g.Sobel(imageB);
+
+    gradientR.save("../GradientRouge.pgm");
+    gradientG.save("../GradientVert.pgm");
+    gradientB.save("../GradientBleu.pgm");
+
+
+    Image<type_pixels> aireR;
+
+    aireR.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
+    for(int i=0;i<aireR.getSizeX();i++){
+        for(int j=0;j<aireR.getSizeY();j++){
+            aireR(i,j) = treeR.area[i][j];
+        }
+    }
+
+    aireR.save("../aireR.pgm");
+
+    Image<type_pixels> aireG;
+
+    aireG.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
+    for(int i=0;i<aireR.getSizeX();i++){
+        for(int j=0;j<aireR.getSizeY();j++){
+            aireG(i,j) = treeG.area[i][j];
+        }
+    }
+
+    aireG.save("../aireG.pgm");
+
+    Image<type_pixels> aireB;
+
+    aireB.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
+    for(int i=0;i<aireR.getSizeX();i++){
+        for(int j=0;j<aireR.getSizeY();j++){
+            aireB(i,j) = treeB.area[i][j];
+        }
+    }
+
+    aireR.save("../aireB.pgm");
 
     imageMerge.setSize(image.getSizeX(),image.getSizeY(),1);
     for(int i=0;i<imageMerge.getSizeX();i++){
