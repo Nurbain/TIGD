@@ -25,9 +25,10 @@ public:
     TreeOfShape treeB;
     TreeOfShape treeMerge;
 
+    void removeShape(int seuil);
 
-
-
+private:
+    RGB couleurParent(LibTIM::Point<TCoord> &p, int seuil);
 };
 
 #endif // COLORTREEOFSHAPE_H

@@ -35,3 +35,39 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
 
     std::cout << "fin construction color tree" << std::endl;
 }
+
+
+
+void colorTreeOfShape::removeShape(int seuil){
+
+    Image<RGB> newImage = Image<RGB>(image.getSizeX(),image.getSizeY());
+
+    for(int i=0;i<image.getSizeX();i++){
+        for(int j=0;j<image.getSizeY();j++){
+            if(treeMerge.area[i][j] < seuil){
+                LibTIM::Point<TCoord> pix = LibTIM::Point<TCoord>(i,j);
+                newImage(i,j) = couleurParent(pix,seuil);
+            }else{
+                newImage(i,j) = image(i,j);
+            }
+        }
+    }
+
+    newImage.save("../resultRemoveShape.pgm");
+}
+
+
+RGB colorTreeOfShape::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
+
+    LibTIM::Point<TCoord> pp = treeMerge.parent[p.x][p.y];
+
+    if(pp.x == p.x && pp.y == p.y && treeMerge.area[pp.x][pp.y] < seuil ){
+        return image(pp.x,pp.y);
+    }else if( treeMerge.area[pp.x][pp.y] < seuil){
+        return couleurParent(pp,seuil);
+    }else{
+        return image(pp.x,pp.y);
+    }
+
+}
+
