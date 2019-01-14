@@ -343,7 +343,15 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
             if(!is_in_image(q) && f(p) == f(q)){
                 LibTIM::Point<LibTIM::TCoord> tmp = parent[q.x][q.y];
                 parent[p.x][p.y] = tmp;
+
+                if(parent[q.x][q.y].x == q.x && parent[q.x][q.y].y == q.y && !is_in_image(parent[q.x][q.y]))
+                    parent[p.x][p.y] = p;
                 parent[q.x][q.y] = p;
+
+                if(f(parent[tmp.x][tmp.y]) == f(tmp)){
+                    parent[p.x][p.y] = parent[tmp.x][tmp.y];
+                }
+
                 /*std::vector<LibTIM::Point<LibTIM::TCoord>> freres = liste_fils(q);
                 for(auto& f:freres){
                     parent[f.x][f.y] = p;
@@ -392,7 +400,7 @@ void TreeOfShape::saveGraphe(const std::string& path) const{
         file << "strict graph {" << std::endl;
         for(uint x=0;x<parent.size();x++){
             for(uint y=0;y<parent[x].size();y++){
-                file << "\"(" << parent[x][y].x << "," << parent[x][y].y << ")\" -- \"(" << x << "," << y << ")\"" << std::endl;
+                file << "\"(" << parent[x][y].x << "," << parent[x][y].y << ") area : " << area[parent[x][y].x][parent[x][y].y] <<"\" -- \"(" << x << "," << y << ") area : "<< area[x][y] <<"\"" << std::endl;
             }
         }
         file << "}" << std::endl;
@@ -412,7 +420,8 @@ void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
     for(int i=R.size()-1;i>=0;i--){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
-        area[q.x][q.y] += area[p.x][p.y];
+        if(q.x != p.x || q.y != p.y)
+            area[q.x][q.y] += area[p.x][p.y];
     }
 
     for(int i=R.size()-1;i>=0;i--){
