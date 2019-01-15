@@ -7,6 +7,7 @@
 #include <cmath>
 #include <sstream>
 
+
 TreeOfShape::TreeOfShape(const char *filename)
 {
     image.load(filename);
@@ -154,34 +155,56 @@ void TreeOfShape::interpolate(){
     }
 }
 
-bool TreeOfShape::is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q){
+bool TreeOfShape::is_empty(std::map<int,std::queue<LibTIM::Point<LibTIM::TCoord>>>& q){
     bool result = true;
-
-    int size = q.size();
-    for(int i=0;i<size;i++){
-        result = q[i].empty() && result;
-    }
+    for(auto it=q.begin();it!=q.end();++it)
+        result = result && it->second.empty();
     return result;
 }
 
-void TreeOfShape::next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
-    int step = 1;
+void TreeOfShape::next_unempty(std::map<int,std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
+    auto it = q.find(l);
+    bool find_next = false;
+    bool find_prev = false;
+    int l_next,l_prev;
     if(is_empty(q))
         return;
-    while(q[l].empty()){
-        if(l+step < q.size() && !q[l+step].empty()){
-            l = l+step;
-            return;
+    for(auto it_next=it;it_next!=q.end() && !find_next;++it_next){
+        if(!it_next->second.empty()){
+            find_next = true;
+            l_next = it_next->first;
         }
-        if(l-step >= 0 && !q[l-step].empty()){
-            l = l-step;
-            return;
+    }
+    for(auto it_prev=it;it_prev!=q.begin() && !find_prev;it_prev--){
+        if(!it_prev->second.empty()){
+            find_prev = true;
+            l_prev = it_prev->first;
         }
-        step++;
+    }
+    if(!find_prev){
+        it = q.begin();
+        if(!it->second.empty()){
+            find_prev = true;
+            l_prev = it->first;
+        }
+    }
+
+    if(!find_next){
+        l=l_prev;
+        return;
+    }
+    if(!find_prev){
+        l=l_next;
+        return;
+    }
+    if(abs(l-l_prev) > abs(l_next-l)){
+        l=l_next;
+    }else{
+        l=l_prev;
     }
 }
 
-LibTIM::Point<LibTIM::TCoord> TreeOfShape::priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
+LibTIM::Point<LibTIM::TCoord> TreeOfShape::priority_pop(std::map<int,std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
     if(q[l].empty()){
         next_unempty(q,l);
     }
@@ -190,7 +213,7 @@ LibTIM::Point<LibTIM::TCoord> TreeOfShape::priority_pop(std::vector<std::queue<L
     return result;
 }
 
-void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,Image<type_pixels>& im_min,Image<type_pixels>& im_max,type_pixels& l){
+void TreeOfShape::priority_push(std::map<int,std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,Image<type_pixels>& im_min,Image<type_pixels>& im_max,type_pixels& l){
     type_pixels lower = im_min(h.x,h.y);
     type_pixels upper = im_max(h.x,h.y);
     int l2;
@@ -202,6 +225,9 @@ void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCo
         }else{
             l2 =l;
         }
+    }
+    if(q.count(l2) == 0){
+        q.insert(std::make_pair(l2,std::queue<LibTIM::Point<LibTIM::TCoord>>()));
     }
     q[l2].push(h);
 }
@@ -230,9 +256,9 @@ void TreeOfShape::sort(Image<type_pixels>& result_img){
             deja_vu[i][j] = false;
         }
     }
-    std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>> hierarchical_queue;
-    hierarchical_queue.resize(interpolate_image_max.max()+1);
+    std::map<int,std::queue<LibTIM::Point<LibTIM::TCoord>>> hierarchical_queue;
 
+    hierarchical_queue.insert(std::make_pair(interpolate_image_max(0,0),std::queue<LibTIM::Point<LibTIM::TCoord>>()));
     hierarchical_queue[interpolate_image_max(0,0)].push(LibTIM::Point<LibTIM::TCoord>(0,0));
     deja_vu[0][0] = true;
 

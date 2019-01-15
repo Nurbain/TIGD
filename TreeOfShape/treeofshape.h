@@ -5,6 +5,7 @@
 #include "CImg.h"
 #include <vector>
 #include <queue>
+#include <map>
 
 
 //using namespace LibTIM;
@@ -31,10 +32,10 @@ public:
 
 private:
 
-    bool is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q);
-    void next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l);
-    LibTIM::Point<LibTIM::TCoord> priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l);
-    void priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,Image<type_pixels>& im_min,Image<type_pixels>& im_max,type_pixels& l);
+    bool is_empty(std::map<int,std::queue<LibTIM::Point<LibTIM::TCoord>>>& q);
+    void next_unempty(std::map<int, std::queue<LibTIM::Point<LibTIM::TCoord> > > &q, type_pixels& l);
+    LibTIM::Point<LibTIM::TCoord> priority_pop(std::map<int, std::queue<LibTIM::Point<LibTIM::TCoord> > > &q, type_pixels& l);
+    void priority_push(std::map<int, std::queue<LibTIM::Point<LibTIM::TCoord> > > &q, LibTIM::Point<LibTIM::TCoord> h, Image<type_pixels>& im_min, Image<type_pixels>& im_max, type_pixels& l);
     std::vector<LibTIM::Point<LibTIM::TCoord>> get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,Image<type_pixels>& im);
     LibTIM::Point<LibTIM::TCoord> find_root(std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>>& zpar,LibTIM::Point<LibTIM::TCoord>& x);
     type_pixels median;
