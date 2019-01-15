@@ -35,9 +35,7 @@ int main(int argc, char *argv[])
 
     tree.removeShape(20000);
 
-    colorTreeOfShape c_tree("../ImagesTests/JeuxTest.ppm");
-
-    c_tree.treeMerge.saveGraphe("../result/result.gv");
+    colorTreeOfShape c_tree("../ImagesTests/JeuxTest2.ppm");
 
     c_tree.removeShape(2000);
 
