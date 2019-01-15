@@ -8,6 +8,7 @@ CONFIG -= app_bundle
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+LIBS += -lX11
 
 INCLUDEPATH += ../libtim/
 
@@ -20,11 +21,10 @@ SOURCES += \
         main.cpp \
     treeofshape.cpp \
     gradient.cpp \
-    colortreeofshape.cpp \
-    treeofshape32.cpp
+    colortreeofshape.cpp
 
 HEADERS += \
     treeofshape.h \
     gradient.h \
     colortreeofshape.h \
-    treeofshape32.h
+    CImg.h

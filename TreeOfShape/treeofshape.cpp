@@ -9,15 +9,16 @@
 
 TreeOfShape::TreeOfShape(const char *filename)
 {
-    if(LibTIM::Image<type_pixels>::load(filename,image)){
+    image.load(filename);
+    /*if(Image<type_pixels>::load(filename,image)){
         std::cout << "Image Load" <<std::endl;
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
         return;
-    }
+    }*/
     medianCalcule();
     interpolate();
-    LibTIM::Image<type_pixels> result;
+    Image<type_pixels> result;
     sort(result);
     union_find();
     canonize_tree(result);
@@ -29,7 +30,7 @@ TreeOfShape::TreeOfShape(const char *filename)
 TreeOfShape::TreeOfShape(Image<type_pixels>& img):image(img){
     medianCalcule();
     interpolate();
-    LibTIM::Image<type_pixels> result;
+    Image<type_pixels> result;
     sort(result);
     union_find();
     canonize_tree(result);
@@ -41,14 +42,14 @@ TreeOfShape::TreeOfShape(Image<type_pixels>& img):image(img){
 void TreeOfShape::medianCalcule(){
     std::vector<type_pixels> medianVec;
 
-    for(int i=0;i<image.getSizeX();i++){
+    for(int i=0;i<image.width();i++){
         medianVec.push_back(image(i,0));
-        medianVec.push_back(image(i,image.getSizeY()-1));
+        medianVec.push_back(image(i,image.height()-1));
     }
 
-    for(int i=1;i<image.getSizeY()-1;i++){
+    for(int i=1;i<image.height()-1;i++){
         medianVec.push_back(image(0,i));
-        medianVec.push_back(image(image.getSizeX()-1,i));
+        medianVec.push_back(image(image.width()-1,i));
     }
 
 
@@ -60,43 +61,43 @@ void TreeOfShape::medianCalcule(){
 void TreeOfShape::interpolate(){
 
     //Nouvelle Image avec Medianne
-    Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX()+2,image.getSizeY()+2);
+    Image<type_pixels> newImage = Image<type_pixels>(image.width()+2,image.height()+2);
 
-    for(int i=0;i<newImage.getSizeX();i++){
-        for(int j=0;j<newImage.getSizeY();j++){
-            if( i == 0 || j == 0 || i == newImage.getSizeX()-1 || j == newImage.getSizeY()-1)
+    for(int i=0;i<newImage.width();i++){
+        for(int j=0;j<newImage.height();j++){
+            if( i == 0 || j == 0 || i == newImage.width()-1 || j == newImage.height()-1)
                newImage(i,j) = median;
             else
                newImage(i,j) = image(i-1,j-1);
         }
     }
 
-    /*image.setSize(newImage.getSizeX(),newImage.getSizeY(),1);
-    for(int i=0;i<image.getSizeX();i++){
-        for(int j=0;j<image.getSizeY();j++){
+    /*image.setSize(newImage.width(),newImage.height(),1);
+    for(int i=0;i<image.width();i++){
+        for(int j=0;j<image.height();j++){
             image(i,j) = newImage(i,j);
         }
     }*/
 
-    interpolate_image_min = Image<type_pixels>(newImage.getSizeX()*4-1,newImage.getSizeY()*4-1);
-    interpolate_image_max = Image<type_pixels>(newImage.getSizeX()*4-1,newImage.getSizeY()*4-1);
+    interpolate_image_min = Image<type_pixels>(newImage.width()*4-1,newImage.height()*4-1);
+    interpolate_image_max = Image<type_pixels>(newImage.width()*4-1,newImage.height()*4-1);
 
     //Dim 2
-    for(int i = 0; i<newImage.getSizeX(); i++){
-        for(int j=0; j<newImage.getSizeY();j++){
+    for(int i = 0; i<newImage.width(); i++){
+        for(int j=0; j<newImage.height();j++){
             interpolate_image_min(i*4+1,j*4+1) = newImage(i,j); //From Image
             interpolate_image_max(i*4+1,j*4+1) = newImage(i,j);
 
 
-            if(j !=newImage.getSizeY()-1 && i !=newImage.getSizeX()-1){
+            if(j !=newImage.height()-1 && i !=newImage.width()-1){
                 interpolate_image_min((i*4+3),(j*4+3)) = newImage(i,j) > newImage(i+1,j+1) ? newImage(i,j) : newImage(i+1,j+1); //Diago basse droite
                 interpolate_image_max((i*4+3),(j*4+3)) = newImage(i,j) > newImage(i+1,j+1) ? newImage(i,j) : newImage(i+1,j+1);
             }
-            if(i !=newImage.getSizeX()-1){
+            if(i !=newImage.width()-1){
                 interpolate_image_min(i*4+3,j*4+1) = newImage(i,j) > newImage(i+1,j) ? newImage(i,j) : newImage(i+1,j); //Ligne Droite
                 interpolate_image_max(i*4+3,j*4+1) = newImage(i,j) > newImage(i+1,j) ? newImage(i,j) : newImage(i+1,j);
             }
-            if(j !=newImage.getSizeY()-1){
+            if(j !=newImage.height()-1){
                 interpolate_image_min(i*4+1,j*4+3) = newImage(i,j) > newImage(i,j+1) ? newImage(i,j) : newImage(i,j+1); //Colonne Basse
                 interpolate_image_max(i*4+1,j*4+3) = newImage(i,j) > newImage(i,j+1) ? newImage(i,j) : newImage(i,j+1);
             }
@@ -104,15 +105,15 @@ void TreeOfShape::interpolate(){
     }
 
     //Dim 1
-    for(int i = 1; i<interpolate_image_min.getSizeX(); i=i+2){
-        for(int j=1; j<interpolate_image_min.getSizeY();j=j+2){
+    for(int i = 1; i<interpolate_image_min.width(); i=i+2){
+        for(int j=1; j<interpolate_image_min.height();j=j+2){
 
-            if(j !=interpolate_image_min.getSizeY()-2){
+            if(j !=interpolate_image_min.height()-2){
                 interpolate_image_min(i,j+1) = interpolate_image_min(i,j) < interpolate_image_min(i,j+2) ? interpolate_image_min(i,j) : interpolate_image_min(i,j+2); //Ligne Droite
                 interpolate_image_max(i,j+1) = interpolate_image_max(i,j) > interpolate_image_max(i,j+2) ? interpolate_image_max(i,j) : interpolate_image_max(i,j+2); //Ligne Droite
             }
 
-            if(i !=interpolate_image_min.getSizeX()-2){
+            if(i !=interpolate_image_min.width()-2){
                 interpolate_image_min(i+1,j) = interpolate_image_min(i,j) < interpolate_image_min(i+2,j) ? interpolate_image_min(i,j) : interpolate_image_min(i+2,j); //Colonne Basse
                 interpolate_image_max(i+1,j) = interpolate_image_max(i,j) > interpolate_image_max(i+2,j) ? interpolate_image_max(i,j) : interpolate_image_max(i+2,j); //Colonne Basse
             }
@@ -120,8 +121,8 @@ void TreeOfShape::interpolate(){
     }
 
     //Dim 1 Exterieur
-    for(int i = 0; i<interpolate_image_min.getSizeX(); i++){
-        for(int j=0; j<interpolate_image_min.getSizeY();j++){
+    for(int i = 0; i<interpolate_image_min.width(); i++){
+        for(int j=0; j<interpolate_image_min.height();j++){
 
             if(i==0){
                 interpolate_image_min(i,j) = median;
@@ -129,10 +130,10 @@ void TreeOfShape::interpolate(){
             }else if(j==0){
                 interpolate_image_min(i,j) = median;
                 interpolate_image_max(i,j) = median;
-            }else if(i==interpolate_image_min.getSizeX()-1){
+            }else if(i==interpolate_image_min.width()-1){
                 interpolate_image_min(i,j) = median;
                 interpolate_image_max(i,j) = median;
-            }else if(j==interpolate_image_min.getSizeY()-1){
+            }else if(j==interpolate_image_min.height()-1){
                 interpolate_image_min(i,j) = median;
                 interpolate_image_max(i,j) = median;
             }
@@ -140,8 +141,8 @@ void TreeOfShape::interpolate(){
     }
 
     //Dim 0
-    for(int i = 2; i<interpolate_image_min.getSizeX()-1; i=i+2){
-        for(int j=2; j<interpolate_image_min.getSizeY()-1;j=j+2){
+    for(int i = 2; i<interpolate_image_min.width()-1; i=i+2){
+        for(int j=2; j<interpolate_image_min.height()-1;j=j+2){
             type_pixels minInterval1 = std::min(interpolate_image_min(i-1,j),interpolate_image_min(i+1,j));
             type_pixels minInterval2 = std::min(interpolate_image_min(i,j-1),interpolate_image_min(i,j+1));
             interpolate_image_min(i,j) = std::min(minInterval1,minInterval2);
@@ -189,9 +190,9 @@ LibTIM::Point<LibTIM::TCoord> TreeOfShape::priority_pop(std::vector<std::queue<L
     return result;
 }
 
-void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,LibTIM::Image<type_pixels>& im_min,LibTIM::Image<type_pixels>& im_max,type_pixels& l){
-    type_pixels lower = im_min(h);
-    type_pixels upper = im_max(h);
+void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,Image<type_pixels>& im_min,Image<type_pixels>& im_max,type_pixels& l){
+    type_pixels lower = im_min(h.x,h.y);
+    type_pixels upper = im_max(h.x,h.y);
     int l2;
     if(lower > l){
         l2 = lower;
@@ -205,32 +206,32 @@ void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCo
     q[l2].push(h);
 }
 
-std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,LibTIM::Image<type_pixels>& im){
+std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,Image<type_pixels>& im){
     std::vector<LibTIM::Point<LibTIM::TCoord>> result;
 
     for(int i=-1;i<=1;i++){
         if(i==0)
             continue;
-        if(p.x+i >=0 && p.x+i < im.getSizeX())
+        if(p.x+i >=0 && p.x+i < im.width())
             result.push_back(LibTIM::Point<LibTIM::TCoord>(p.x+i,p.y));
-        if(p.y+i >=0 && p.y+i < im.getSizeY())
+        if(p.y+i >=0 && p.y+i < im.height())
             result.push_back(LibTIM::Point<LibTIM::TCoord>(p.x,p.y+i));
     }
     return result;
 }
 
-void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
-    result_img.setSize(interpolate_image_max.getSizeX(),interpolate_image_max.getSizeY(),1);
+void TreeOfShape::sort(Image<type_pixels>& result_img){
+    result_img.resize(interpolate_image_max.width(),interpolate_image_max.height(),1,1);
     std::vector<std::vector<bool>> deja_vu;
-    deja_vu.resize(interpolate_image_min.getSizeX());
-    for(int i=0;i<interpolate_image_min.getSizeX();i++){
-        deja_vu[i].resize(interpolate_image_min.getSizeY());
-        for(int j=0;j<interpolate_image_min.getSizeY();j++){
+    deja_vu.resize(interpolate_image_min.width());
+    for(int i=0;i<interpolate_image_min.width();i++){
+        deja_vu[i].resize(interpolate_image_min.height());
+        for(int j=0;j<interpolate_image_min.height();j++){
             deja_vu[i][j] = false;
         }
     }
     std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>> hierarchical_queue;
-    hierarchical_queue.resize(interpolate_image_max.getMax()+1);
+    hierarchical_queue.resize(interpolate_image_max.max()+1);
 
     hierarchical_queue[interpolate_image_max(0,0)].push(LibTIM::Point<LibTIM::TCoord>(0,0));
     deja_vu[0][0] = true;
@@ -239,7 +240,7 @@ void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
 
     while(!is_empty(hierarchical_queue)){
         LibTIM::Point<LibTIM::TCoord> h = priority_pop(hierarchical_queue,l);
-        result_img(h) = l;
+        result_img(h.x,h.y) = l;
         R.push_back(h);
         std::vector<LibTIM::Point<LibTIM::TCoord>> voisins = get_voisinage(h,interpolate_image_max);
         for(auto& n:voisins){
@@ -264,17 +265,17 @@ LibTIM::Point<LibTIM::TCoord> TreeOfShape::find_root(std::vector<std::vector<Lib
 
 std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(){
     std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> zpar;
-    zpar.resize(interpolate_image_min.getSizeX());
-    for(int i=0;i<interpolate_image_min.getSizeX();i++){
-        zpar[i].resize(interpolate_image_min.getSizeY());
-        for(int j=0;j<interpolate_image_min.getSizeY();j++){
+    zpar.resize(interpolate_image_min.width());
+    for(int i=0;i<interpolate_image_min.width();i++){
+        zpar[i].resize(interpolate_image_min.height());
+        for(int j=0;j<interpolate_image_min.height();j++){
             zpar[i][j] = LibTIM::Point<LibTIM::TCoord>(-1,-1);
         }
     }
-    parent.resize(interpolate_image_min.getSizeX());
-    for(int i=0;i<interpolate_image_min.getSizeX();i++){
-        parent[i].resize(interpolate_image_min.getSizeY());
-        for(int j=0;j<interpolate_image_min.getSizeY();j++){
+    parent.resize(interpolate_image_min.width());
+    for(int i=0;i<interpolate_image_min.width();i++){
+        parent[i].resize(interpolate_image_min.height());
+        for(int j=0;j<interpolate_image_min.height();j++){
             parent[i][j] = LibTIM::Point<LibTIM::TCoord>(-1,-1);
         }
     }
@@ -297,11 +298,11 @@ std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(
     return parent;
 }
 
-void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
+void TreeOfShape::canonize_tree(Image<type_pixels>& f){
     for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
-        if(f(parent[q.x][q.y]) == f(q)){
+        if(f(parent[q.x][q.y].x,parent[q.x][q.y].y) == f(q.x,q.y)){
             parent[p.x][p.y] = parent[q.x][q.y];
         }
     }
@@ -309,7 +310,7 @@ void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
 
 bool TreeOfShape::is_in_image(LibTIM::Point<LibTIM::TCoord>& p){
     LibTIM::TCoord x = p.x,y=p.y;
-    if(x == 1 || y == 1 || x == interpolate_image_max.getSizeX()-2 || y == interpolate_image_max.getSizeY()-2){
+    if(x == 1 || y == 1 || x == interpolate_image_max.width()-2 || y == interpolate_image_max.height()-2){
         return false;
     }
     x-=1;
@@ -320,8 +321,8 @@ bool TreeOfShape::is_in_image(LibTIM::Point<LibTIM::TCoord>& p){
 std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point<LibTIM::TCoord>& p){
     std::vector<LibTIM::Point<LibTIM::TCoord>> result;
 
-    for(int i=0;i<interpolate_image_min.getSizeX();i++){
-        for(int j=0;j<interpolate_image_min.getSizeY();j++){
+    for(int i=0;i<interpolate_image_min.width();i++){
+        for(int j=0;j<interpolate_image_min.height();j++){
             LibTIM::Point<LibTIM::TCoord> q = parent[i][j];
             if(i == p.x && j == p.y)
                 continue;
@@ -335,12 +336,12 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point
 }
 
 
-void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
+void TreeOfShape::un_interpolate(Image<type_pixels> &f){
     for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
             LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
-            if(!is_in_image(q) && f(p) == f(q)){
+            if(!is_in_image(q) && f(p.x,p.y) == f(q.x,q.y)){
                 LibTIM::Point<LibTIM::TCoord> tmp = parent[q.x][q.y];
                 parent[p.x][p.y] = tmp;
 
@@ -348,7 +349,7 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
                     parent[p.x][p.y] = p;
                 parent[q.x][q.y] = p;
 
-                if(f(parent[tmp.x][tmp.y]) == f(tmp)){
+                if(f(parent[tmp.x][tmp.y].x,parent[tmp.x][tmp.y].y) == f(tmp.x,tmp.y)){
                     parent[p.x][p.y] = parent[tmp.x][tmp.y];
                 }
 
@@ -367,13 +368,13 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
 
     canonize_tree(f);
 
-    std::vector<std::vector<LibTIM::Point<TCoord>>> parent_clean;
+    std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> parent_clean;
     std::vector<LibTIM::Point<LibTIM::TCoord>> R_clean;
 
-    parent_clean.resize(image.getSizeX());
-    for(int i=0;i<image.getSizeX();i++){
-        parent_clean[i].resize(image.getSizeY());
-        for(int j=0;j<image.getSizeY();j++){
+    parent_clean.resize(image.width());
+    for(int i=0;i<image.width();i++){
+        parent_clean[i].resize(image.height());
+        for(int j=0;j<image.height();j++){
             parent_clean[i][j] = LibTIM::Point<LibTIM::TCoord>(-1,-1);
         }
     }
@@ -408,11 +409,11 @@ void TreeOfShape::saveGraphe(const std::string& path) const{
     }
 }
 
-void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
-    area.resize(image.getSizeX());
-    for(int i=0;i<image.getSizeX();i++){
-        area[i].resize(image.getSizeY());
-        for(int j=0;j<image.getSizeY();j++){
+void TreeOfShape::compute_area(Image<type_pixels> &f){
+    area.resize(image.width());
+    for(int i=0;i<image.width();i++){
+        area[i].resize(image.height());
+        for(int j=0;j<image.height();j++){
             area[i][j] = 1;
         }
     }
@@ -429,7 +430,7 @@ void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
         LibTIM::Point<LibTIM::TCoord> tmp((p.x+1)*4+1,(p.y+1)*4+1);
         LibTIM::Point<LibTIM::TCoord> tmp2((q.x+1)*4+1,(q.y+1)*4+1);
-        if(f(tmp) == f(tmp2))
+        if(f(tmp.x,tmp.y) == f(tmp2.x,tmp2.y))
             area[p.x][p.y] = area[q.x][q.y];
     }
 }
@@ -437,12 +438,12 @@ void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
 
 void TreeOfShape::removeShape(int seuil){
 
-    Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX(),image.getSizeY());
+    Image<type_pixels> newImage = Image<type_pixels>(image.width(),image.height());
 
-    for(int i=0;i<image.getSizeX();i++){
-        for(int j=0;j<image.getSizeY();j++){
+    for(int i=0;i<image.width();i++){
+        for(int j=0;j<image.height();j++){
             if(area[i][j] < seuil){
-                LibTIM::Point<TCoord> pix = LibTIM::Point<TCoord>(i,j);
+                LibTIM::Point<LibTIM::TCoord> pix = LibTIM::Point<LibTIM::TCoord>(i,j);
                 newImage(i,j) = couleurParent(pix,seuil);
             }else{
                 newImage(i,j) = image(i,j);
@@ -453,9 +454,9 @@ void TreeOfShape::removeShape(int seuil){
     newImage.save("../resultRemoveShape.pgm");
 }
 
-type_pixels TreeOfShape::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
+type_pixels TreeOfShape::couleurParent(LibTIM::Point<LibTIM::TCoord> &p, int seuil){
 
-    LibTIM::Point<TCoord> pp = parent[p.x][p.y];
+    LibTIM::Point<LibTIM::TCoord> pp = parent[p.x][p.y];
 
     if(pp.x == p.x && pp.y == p.y && area[pp.x][pp.y] < seuil ){
         return image(pp.x,pp.y);

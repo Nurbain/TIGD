@@ -2,16 +2,13 @@
 #define COLORTREEOFSHAPE_H
 
 #include "treeofshape.h"
-#include "treeofshape32.h"
-
-using namespace LibTIM;
 
 class colorTreeOfShape
 {
 public:
     colorTreeOfShape(const char *filename);
 
-    Image<RGB> image;
+    Image<int> image;
 
 
     Image<type_pixels> imageR;
@@ -29,7 +26,7 @@ public:
     void removeShape(int seuil);
 
 private:
-    RGB couleurParent(LibTIM::Point<TCoord> &p, int seuil);
+    void couleurParent(LibTIM::Point<LibTIM::TCoord> &p, int seuil,int& r,int& g,int& b);
 };
 
 #endif // COLORTREEOFSHAPE_H

@@ -3,29 +3,30 @@
 
 colorTreeOfShape::colorTreeOfShape(const char *filename)
 {
-    if(LibTIM::Image<RGB>::load(filename,image)){
+    image.load(filename);
+    /*if(Image<int>::load(filename,image)){
         std::cout << "Image Load" <<std::endl;
     }else{
         std::cout << "Image Non Load y'a un prb" <<std::endl;
         return;
-    }
+    }*/
 
-    imageR.setSize(image.getSizeX(),image.getSizeY(),1);
-    for(int i=0;i<imageR.getSizeX();i++){
-        for(int j=0;j<imageR.getSizeY();j++){
-            imageR(i,j) = image(i,j)[0];
+    imageR.resize(image.width(),image.height(),1);
+    for(int i=0;i<imageR.width();i++){
+        for(int j=0;j<imageR.height();j++){
+            imageR(i,j) = image(i,j,0,0);
         }
     }
-    imageG.setSize(image.getSizeX(),image.getSizeY(),1);
-    for(int i=0;i<imageG.getSizeX();i++){
-        for(int j=0;j<imageG.getSizeY();j++){
-            imageG(i,j) = image(i,j)[1];
+    imageG.resize(image.width(),image.height(),1);
+    for(int i=0;i<imageG.width();i++){
+        for(int j=0;j<imageG.height();j++){
+            imageG(i,j) = image(i,j,0,1);
         }
     }
-    imageB.setSize(image.getSizeX(),image.getSizeY(),1);
-    for(int i=0;i<imageB.getSizeX();i++){
-        for(int j=0;j<imageB.getSizeY();j++){
-            imageB(i,j) = image(i,j)[2];
+    imageB.resize(image.width(),image.height(),1);
+    for(int i=0;i<imageB.width();i++){
+        for(int j=0;j<imageB.height();j++){
+            imageB(i,j) = image(i,j,0,2);
         }
     }
 
@@ -49,9 +50,9 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
 
     Image<type_pixels> aireR;
 
-    aireR.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
-    for(int i=0;i<aireR.getSizeX();i++){
-        for(int j=0;j<aireR.getSizeY();j++){
+    aireR.resize(imageR.width(),imageR.height(),1);
+    for(int i=0;i<aireR.width();i++){
+        for(int j=0;j<aireR.height();j++){
              aireR(i,j) = treeR.area[i][j];
         }
     }
@@ -60,9 +61,9 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
 
     Image<type_pixels> aireG;
 
-    aireG.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
-    for(int i=0;i<aireR.getSizeX();i++){
-        for(int j=0;j<aireR.getSizeY();j++){
+    aireG.resize(imageR.width(),imageR.height(),1);
+    for(int i=0;i<aireR.width();i++){
+        for(int j=0;j<aireR.height();j++){
             aireG(i,j) = treeG.area[i][j];
         }
     }
@@ -71,18 +72,18 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
 
     Image<type_pixels> aireB;
 
-    aireB.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
-    for(int i=0;i<aireR.getSizeX();i++){
-        for(int j=0;j<aireR.getSizeY();j++){
+    aireB.resize(imageR.width(),imageR.height(),1);
+    for(int i=0;i<aireR.width();i++){
+        for(int j=0;j<aireR.height();j++){
             aireB(i,j) = treeB.area[i][j];
         }
     }
 
     aireR.save("../aireB.pgm");
 
-    imageMerge.setSize(image.getSizeX(),image.getSizeY(),1);
-    for(int i=0;i<imageMerge.getSizeX();i++){
-        for(int j=0;j<imageMerge.getSizeY();j++){
+    imageMerge.resize(image.width(),image.height(),1);
+    for(int i=0;i<imageMerge.width();i++){
+        for(int j=0;j<imageMerge.height();j++){
             if(gradientR(i,j)>gradientG(i,j)){
                 if(gradientR(i,j)>gradientB(i,j)){
                     imageMerge(i,j) = treeR.area[i][j];
@@ -110,15 +111,24 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
 
 void colorTreeOfShape::removeShape(int seuil){
 
-    Image<RGB> newImage = Image<RGB>(image.getSizeX(),image.getSizeY());
-
-    for(int i=0;i<image.getSizeX();i++){
-        for(int j=0;j<image.getSizeY();j++){
+    Image<int> newImage = Image<int>(image.width(),image.height(),1,3);
+    int r,g,b;
+    for(int i=0;i<image.width();i++){
+        for(int j=0;j<image.height();j++){
             if(treeMerge.area[i][j] < seuil){
-                LibTIM::Point<TCoord> pix = LibTIM::Point<TCoord>(i,j);
-                newImage(i,j) = couleurParent(pix,seuil);
+                LibTIM::Point<LibTIM::TCoord> pix = LibTIM::Point<LibTIM::TCoord>(i,j);
+
+                couleurParent(pix,seuil,r,g,b);
+                newImage(i,j,0,0) = r;
+                newImage(i,j,0,1) = g;
+                newImage(i,j,0,2) = b;
             }else{
-                newImage(i,j) = image(i,j);
+                r = image(i,j,0,0);
+                g = image(i,j,0,1);
+                b = image(i,j,0,2);
+                newImage(i,j,0,0) = r;
+                newImage(i,j,0,1) = g;
+                newImage(i,j,0,2) = b;
             }
         }
     }
@@ -127,17 +137,20 @@ void colorTreeOfShape::removeShape(int seuil){
 }
 
 
-RGB colorTreeOfShape::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
+void colorTreeOfShape::couleurParent(LibTIM::Point<LibTIM::TCoord> &p, int seuil,int& r,int& g,int& b){
 
-    LibTIM::Point<TCoord> pp = treeMerge.parent[p.x][p.y];
+    LibTIM::Point<LibTIM::TCoord> pp = treeMerge.parent[p.x][p.y];
 
     if(pp.x == p.x && pp.y == p.y && treeMerge.area[pp.x][pp.y] < seuil ){
-        return image(pp.x,pp.y);
+        r = image(pp.x,pp.y,0,0);
+        g = image(pp.x,pp.y,0,1);
+        b = image(pp.x,pp.y,0,2);
     }else if( treeMerge.area[pp.x][pp.y] < seuil){
-        return couleurParent(pp,seuil);
+        couleurParent(pp,seuil,r,g,b);
     }else{
-        return image(pp.x,pp.y);
+        r = image(pp.x,pp.y,0,0);
+        g = image(pp.x,pp.y,0,1);
+        b = image(pp.x,pp.y,0,2);
     }
 
 }
-

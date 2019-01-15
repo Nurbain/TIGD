@@ -1,13 +1,12 @@
 #ifndef GRADIENT_H
 #define GRADIENT_H
 
-#include "Common/Image.h"
 #include "treeofshape.h"
 #include <math.h>
 
-using namespace LibTIM;
 
-using result_type = U8;
+
+using result_type = type_pixels;
 class Gradient
 {
 public:
