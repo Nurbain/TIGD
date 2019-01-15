@@ -16,14 +16,14 @@ Dans un premier temps l'image est interpolée, puis triée par l'algorithme **So
 Cet article décrit comment réaliser un arbre des formes sur images couleurs, l'image donnée est décomposée en trois images correspondant au trois composante rouge, bleu et vert de chaque pixel. Ensuite sur ces images leur arbre des formes, d'après la méthode précédente, sont calculés.   
 Une image d'aire de forme est calculée, pour ce faire chaque noeuds de l'arbre se voit attribuer une zone, le nombre de pixels de la forme qu'il représente, chaque pixel de cette image d'aire possède alors la valeur de la zone du noeud auquel il correspond. On fusionne ensuite les images d'aire par le biais d'un gradient (précisé dans le point technique) pour finir sur le calcul de l'arbre des formes suivant cette derniere image de fusion. 
 
-1. Image de la composante rouge :
-(![Image de la composante rouge](/ReadmeMedia/rouge.jpg))    
+1. Image de la composante rouge :   
+![Image de la composante rouge](/ReadmeMedia/rouge.png)    
 
-2. Image d'aire de forme de la composante rouge : 
-(![Image d'aire de forme de la composante rouge](/ReadmeMedia/aireR.jpg)) 
+2. Image d'aire de forme de la composante rouge :   
+![Image d'aire de forme de la composante rouge](/ReadmeMedia/aireR.jpg) 
 
-3. Image du gradient appliqué sur l'image de composante rouge :
-(![Gradient de la composante rouge](/ReadmeMedia/GradientRouge.jpg)) 
+3. Image du gradient appliqué sur l'image de composante rouge :   
+![Gradient de la composante rouge](/ReadmeMedia/GradientRouge.png)
 
 
 ### *Structure dépot*
