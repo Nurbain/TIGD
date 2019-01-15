@@ -7,11 +7,23 @@
 
 ### *Calcul de l'arbre des formes en temps linéaire*
 
-Cette article décris une méthode permettant de réaliser un arbre de forme sur une image en nuance de gris. Cet article fut nécessaire pour pouvoir développer la méthode dans l'article suivant, article ayant était choisi pour ce projet. 
+Cet article décris une méthode permettant de réaliser un arbre de forme sur une image en nuance de gris. Cet article fut nécessaire pour pouvoir développer la méthode dans l'article suivant, article ayant était choisi pour ce projet. 
+
+Dans un premier temps l'image est interpolée, puis triée par l'algorithme **Sort** décrit dans l'article. Les unions entre noeuds parents et fils sont ensuite calculés par l'algorithme **Union_Find** expliqué dans le papier. Enfin une fonction permettant de rendre les parents de l'arbre canonique est appliqué. L'image est enfin désinterpolée permettent de supprimer les points ajoutés lors de l'opération et permetttant le calcul de l'arbre. 
 
 ### *Extension de l'arbre des formes aux images couleur*
 
+Cet article décrit comment réaliser un arbre des formes sur images couleurs, l'image donnée est décomposée en trois images correspondant au trois composante rouge, bleu et vert de chaque pixel. Ensuite sur ces images leur arbre des formes, d'après la méthode précédente, sont calculés.   
+Une image d'aire de forme est calculée, pour ce faire chaque noeuds de l'arbre se voit attribuer une zone, le nombre de pixels de la forme qu'il représente, chaque pixel de cette image d'aire possède alors la valeur de la zone du noeud auquel il correspond. On fusionne ensuite les images d'aire par le biais d'un gradient (précisé dans le point technique) pour finir sur le calcul de l'arbre des formes suivant cette derniere image de fusion. 
 
+1. Image de la composante rouge :
+(![Image de la composante rouge](/result/rouge.pgm))    
+
+2. Image d'aire de forme de la composante rouge : 
+(![Image d'aire de forme de la composante rouge](/result/aireR.pgm)) 
+
+3. Image du gradient appliqué sur l'image de composante rouge :
+(![Gradient de la composante rouge](/result/GradientRouge.pgm)) 
 
 
 ### *Structure dépot*
@@ -28,9 +40,13 @@ Les dossiers *"ImagesTest"* et *"Result"* contiennent respectivement les jeux de
 
 L’image couleur rentrée est chargée dans un objet Image de la librairie Cimg, elle est ensuite divisé en une image suivant la composante rouge, une suivant la composante vert, et une suivant la composante bleu dans la classe *“ColorTreeOfShape”*. 
 Les arbres des formes (classe “TreeOfShape”), sont ensuite calculés suivant la méthode décrite plus haut. Les aires des formes sont calculées suivant la méthode présentée précédemment. 
-Pour obtenir une image représentant la fusion des aires des formes des différentes composantes nous appliquons d'abord un gradient Sobel sur les images  (![Sobel sur l'image de composante Rouge](/result/GradientRouge.pgm)) par la suite la fusion des aires des formes en chaque point dans l'image est calculé suivant cette méthode :    
+Pour obtenir une image représentant la fusion des aires des formes des différentes composantes nous appliquons d'abord un gradient Sobel sur les images.     
+(![Sobel sur l'image de composante Rouge](/result/GradientRouge.pgm)) 
+
+Par la suite la fusion des aires des formes en chaque point dans l'image est calculé suivant cette méthode :    
 ![methode](/ReadmeMedia/methodeAire.png)
-basé sur les images gradients des différentes composantes de couleur, r pour rouge, b pour bleu et g pour vert. 
+
+basée sur les images gradients des différentes composantes de couleur, r pour rouge, b pour bleu et g pour vert. 
 
 L’arbre des formes final correspond à l’arbre des formes de l’image représentant la fusion des aires des composantes.
 
@@ -52,7 +68,7 @@ Voici quelques résultats obtenus sur deux images tests.
 
 ![Test 1](/ReadmeMedia/JeuxTest.jpg) ![Résultat 1](/ReadmeMedia/resultat1.jpg)
 
-![Test 1](/ReadmeMedia/JeuxTest2.jpg) ![Résultat 1](/ReadmeMedia/resultat2.jpg)
+![Test 2](/ReadmeMedia/JeuxTest2.jpg) ![Résultat 2](/ReadmeMedia/resultat2.jpg)
 
 ### *Problème & perspectives*
 
