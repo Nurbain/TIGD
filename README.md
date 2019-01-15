@@ -17,13 +17,13 @@ Cet article décrit comment réaliser un arbre des formes sur images couleurs, l
 Une image d'aire de forme est calculée, pour ce faire chaque noeuds de l'arbre se voit attribuer une zone, le nombre de pixels de la forme qu'il représente, chaque pixel de cette image d'aire possède alors la valeur de la zone du noeud auquel il correspond. On fusionne ensuite les images d'aire par le biais d'un gradient (précisé dans le point technique) pour finir sur le calcul de l'arbre des formes suivant cette derniere image de fusion. 
 
 1. Image de la composante rouge :
-(![Image de la composante rouge](/result/rouge.pgm))    
+(![Image de la composante rouge](/ReadmeMedia/rouge.jpg))    
 
 2. Image d'aire de forme de la composante rouge : 
-(![Image d'aire de forme de la composante rouge](/result/aireR.pgm)) 
+(![Image d'aire de forme de la composante rouge](/ReadmeMedia/aireR.jpg)) 
 
 3. Image du gradient appliqué sur l'image de composante rouge :
-(![Gradient de la composante rouge](/result/GradientRouge.pgm)) 
+(![Gradient de la composante rouge](/ReadmeMedia/GradientRouge.jpg)) 
 
 
 ### *Structure dépot*
@@ -41,7 +41,7 @@ Les dossiers *"ImagesTest"* et *"Result"* contiennent respectivement les jeux de
 L’image couleur rentrée est chargée dans un objet Image de la librairie Cimg, elle est ensuite divisé en une image suivant la composante rouge, une suivant la composante vert, et une suivant la composante bleu dans la classe *“ColorTreeOfShape”*. 
 Les arbres des formes (classe “TreeOfShape”), sont ensuite calculés suivant la méthode décrite plus haut. Les aires des formes sont calculées suivant la méthode présentée précédemment. 
 Pour obtenir une image représentant la fusion des aires des formes des différentes composantes nous appliquons d'abord un gradient Sobel sur les images.     
-(![Sobel sur l'image de composante Rouge](/result/GradientRouge.pgm)) 
+(![Sobel sur l'image de composante Rouge](/ReadmeMedia/GradientRouge.jpg)) 
 
 Par la suite la fusion des aires des formes en chaque point dans l'image est calculé suivant cette méthode :    
 ![methode](/ReadmeMedia/methodeAire.png)
