@@ -30,9 +30,9 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
         }
     }
 
-    imageR.save("../rouge.pgm");
-    imageG.save("../vert.pgm");
-    imageB.save("../bleu.pgm");
+    imageR.save("../result/rouge.pgm");
+    imageG.save("../result/vert.pgm");
+    imageB.save("../result/bleu.pgm");
 
     treeR = TreeOfShape(imageR);
     treeG = TreeOfShape(imageG);
@@ -43,9 +43,9 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
     Image<result_type> gradientG = g.Sobel(imageG);
     Image<result_type> gradientB = g.Sobel(imageB);
 
-    gradientR.save("../GradientRouge.pgm");
-    gradientG.save("../GradientVert.pgm");
-    gradientB.save("../GradientBleu.pgm");
+    gradientR.save("../result/GradientRouge.pgm");
+    gradientG.save("../result/GradientVert.pgm");
+    gradientB.save("../result/GradientBleu.pgm");
 
 
     Image<type_pixels> aireR;
@@ -57,7 +57,7 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
         }
     }
 
-    aireR.save("../aireR.pgm");
+    aireR.save("../result/aireR.pgm");
 
     Image<type_pixels> aireG;
 
@@ -68,7 +68,7 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
         }
     }
 
-    aireG.save("../aireG.pgm");
+    aireG.save("../result/aireG.pgm");
 
     Image<type_pixels> aireB;
 
@@ -79,7 +79,7 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
         }
     }
 
-    aireR.save("../aireB.pgm");
+    aireR.save("../result/aireB.pgm");
 
     imageMerge.resize(image.width(),image.height(),1);
     for(int i=0;i<imageMerge.width();i++){
@@ -100,7 +100,7 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
         }
     }
 
-    imageMerge.save("../aireM.pgm");
+    imageMerge.save("../result/aireM.pgm");
 
     treeMerge = TreeOfShape(imageMerge);
 
@@ -133,7 +133,7 @@ void colorTreeOfShape::removeShape(int seuil){
         }
     }
 
-    newImage.save("../resultRemoveShape.pgm");
+    newImage.save("../result/resultRemoveShape.pgm");
 }
 
 
