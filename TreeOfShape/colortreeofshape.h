@@ -2,6 +2,7 @@
 #define COLORTREEOFSHAPE_H
 
 #include "treeofshape.h"
+#include "treeofshape32.h"
 
 using namespace LibTIM;
 

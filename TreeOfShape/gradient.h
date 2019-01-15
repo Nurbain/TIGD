@@ -2,17 +2,18 @@
 #define GRADIENT_H
 
 #include "Common/Image.h"
+#include "treeofshape.h"
 #include <math.h>
 
 using namespace LibTIM;
 
-using type_pixels = LibTIM::U8;
+using result_type = U8;
 class Gradient
 {
 public:
     Gradient(){}
 
-    Image<type_pixels> Sobel(const Image<type_pixels>& img);
+    Image<result_type> Sobel(const Image<type_pixels>& img);
 };
 
 

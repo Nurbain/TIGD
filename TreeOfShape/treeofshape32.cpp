@@ -1,4 +1,4 @@
-#include "treeofshape.h"
+#include "treeofshape32.h"
 
 #include <vector>
 #include <algorithm>
@@ -7,17 +7,10 @@
 #include <cmath>
 #include <sstream>
 
-TreeOfShape::TreeOfShape(const char *filename)
-{
-    if(LibTIM::Image<type_pixels>::load(filename,image)){
-        std::cout << "Image Load" <<std::endl;
-    }else{
-        std::cout << "Image Non Load y'a un prb" <<std::endl;
-        return;
-    }
+TreeOfShape32::TreeOfShape32(Image<pixels32>& img):image(img){
     medianCalcule();
     interpolate();
-    LibTIM::Image<type_pixels> result;
+    LibTIM::Image<pixels32> result;
     sort(result);
     union_find();
     canonize_tree(result);
@@ -26,20 +19,8 @@ TreeOfShape::TreeOfShape(const char *filename)
     std::cout << "fin construction tree" << std::endl;
 }
 
-TreeOfShape::TreeOfShape(Image<type_pixels>& img):image(img){
-    medianCalcule();
-    interpolate();
-    LibTIM::Image<type_pixels> result;
-    sort(result);
-    union_find();
-    canonize_tree(result);
-    un_interpolate(result);
-    compute_area(result);
-    std::cout << "fin construction tree" << std::endl;
-}
-
-void TreeOfShape::medianCalcule(){
-    std::vector<type_pixels> medianVec;
+void TreeOfShape32::medianCalcule(){
+    std::vector<pixels32> medianVec;
 
     for(int i=0;i<image.getSizeX();i++){
         medianVec.push_back(image(i,0));
@@ -57,10 +38,10 @@ void TreeOfShape::medianCalcule(){
 
 }
 
-void TreeOfShape::interpolate(){
+void TreeOfShape32::interpolate(){
 
     //Nouvelle Image avec Medianne
-    Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX()+2,image.getSizeY()+2);
+    Image<pixels32> newImage = Image<pixels32>(image.getSizeX()+2,image.getSizeY()+2);
 
     for(int i=0;i<newImage.getSizeX();i++){
         for(int j=0;j<newImage.getSizeY();j++){
@@ -78,8 +59,8 @@ void TreeOfShape::interpolate(){
         }
     }*/
 
-    interpolate_image_min = Image<type_pixels>(newImage.getSizeX()*4-1,newImage.getSizeY()*4-1);
-    interpolate_image_max = Image<type_pixels>(newImage.getSizeX()*4-1,newImage.getSizeY()*4-1);
+    interpolate_image_min = Image<pixels32>(newImage.getSizeX()*4-1,newImage.getSizeY()*4-1);
+    interpolate_image_max = Image<pixels32>(newImage.getSizeX()*4-1,newImage.getSizeY()*4-1);
 
     //Dim 2
     for(int i = 0; i<newImage.getSizeX(); i++){
@@ -142,18 +123,18 @@ void TreeOfShape::interpolate(){
     //Dim 0
     for(int i = 2; i<interpolate_image_min.getSizeX()-1; i=i+2){
         for(int j=2; j<interpolate_image_min.getSizeY()-1;j=j+2){
-            type_pixels minInterval1 = std::min(interpolate_image_min(i-1,j),interpolate_image_min(i+1,j));
-            type_pixels minInterval2 = std::min(interpolate_image_min(i,j-1),interpolate_image_min(i,j+1));
+            pixels32 minInterval1 = std::min(interpolate_image_min(i-1,j),interpolate_image_min(i+1,j));
+            pixels32 minInterval2 = std::min(interpolate_image_min(i,j-1),interpolate_image_min(i,j+1));
             interpolate_image_min(i,j) = std::min(minInterval1,minInterval2);
 
-            type_pixels maxInterval1 = std::max(interpolate_image_max(i-1,j),interpolate_image_max(i+1,j));
-            type_pixels maxInterval2 = std::max(interpolate_image_max(i,j-1),interpolate_image_max(i,j+1));
+            pixels32 maxInterval1 = std::max(interpolate_image_max(i-1,j),interpolate_image_max(i+1,j));
+            pixels32 maxInterval2 = std::max(interpolate_image_max(i,j-1),interpolate_image_max(i,j+1));
             interpolate_image_max(i,j) = std::min(maxInterval1,maxInterval2);
         }
     }
 }
 
-bool TreeOfShape::is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q){
+bool is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q){
     bool result = true;
 
     int size = q.size();
@@ -163,7 +144,7 @@ bool TreeOfShape::is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>
     return result;
 }
 
-void TreeOfShape::next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
+void next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,pixels32& l){
     int step = 1;
     if(is_empty(q))
         return;
@@ -180,7 +161,7 @@ void TreeOfShape::next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoo
     }
 }
 
-LibTIM::Point<LibTIM::TCoord> TreeOfShape::priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l){
+LibTIM::Point<LibTIM::TCoord> priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,pixels32& l){
     if(q[l].empty()){
         next_unempty(q,l);
     }
@@ -189,9 +170,9 @@ LibTIM::Point<LibTIM::TCoord> TreeOfShape::priority_pop(std::vector<std::queue<L
     return result;
 }
 
-void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,LibTIM::Image<type_pixels>& im_min,LibTIM::Image<type_pixels>& im_max,type_pixels& l){
-    type_pixels lower = im_min(h);
-    type_pixels upper = im_max(h);
+void priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,LibTIM::Image<pixels32>& im_min,LibTIM::Image<pixels32>& im_max,pixels32& l){
+    pixels32 lower = im_min(h);
+    pixels32 upper = im_max(h);
     int l2;
     if(lower > l){
         l2 = lower;
@@ -205,7 +186,7 @@ void TreeOfShape::priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCo
     q[l2].push(h);
 }
 
-std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,LibTIM::Image<type_pixels>& im){
+std::vector<LibTIM::Point<LibTIM::TCoord>> get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,LibTIM::Image<pixels32>& im){
     std::vector<LibTIM::Point<LibTIM::TCoord>> result;
 
     for(int i=-1;i<=1;i++){
@@ -219,7 +200,7 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::get_voisinage(LibTIM::Po
     return result;
 }
 
-void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
+void TreeOfShape32::sort(LibTIM::Image<pixels32>& result_img){
     result_img.setSize(interpolate_image_max.getSizeX(),interpolate_image_max.getSizeY(),1);
     std::vector<std::vector<bool>> deja_vu;
     deja_vu.resize(interpolate_image_min.getSizeX());
@@ -235,7 +216,7 @@ void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
     hierarchical_queue[interpolate_image_max(0,0)].push(LibTIM::Point<LibTIM::TCoord>(0,0));
     deja_vu[0][0] = true;
 
-    type_pixels l = interpolate_image_max(0,0);
+    pixels32 l = interpolate_image_max(0,0);
 
     while(!is_empty(hierarchical_queue)){
         LibTIM::Point<LibTIM::TCoord> h = priority_pop(hierarchical_queue,l);
@@ -253,7 +234,7 @@ void TreeOfShape::sort(LibTIM::Image<type_pixels>& result_img){
 }
 
 
-LibTIM::Point<LibTIM::TCoord> TreeOfShape::find_root(std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>>& zpar,LibTIM::Point<LibTIM::TCoord>& x){
+LibTIM::Point<LibTIM::TCoord> find_root(std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>>& zpar,LibTIM::Point<LibTIM::TCoord>& x){
     LibTIM::Point<LibTIM::TCoord> p = zpar[x.x][x.y];
     if(p.x == x.x && p.y == x.y){
         return x;
@@ -262,7 +243,7 @@ LibTIM::Point<LibTIM::TCoord> TreeOfShape::find_root(std::vector<std::vector<Lib
     return zpar[x.x][x.y];
 }
 
-std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(){
+std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape32::union_find(){
     std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> zpar;
     zpar.resize(interpolate_image_min.getSizeX());
     for(int i=0;i<interpolate_image_min.getSizeX();i++){
@@ -297,7 +278,7 @@ std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>> TreeOfShape::union_find(
     return parent;
 }
 
-void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
+void TreeOfShape32::canonize_tree(LibTIM::Image<pixels32>& f){
     for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         LibTIM::Point<LibTIM::TCoord> q = parent[p.x][p.y];
@@ -307,7 +288,7 @@ void TreeOfShape::canonize_tree(LibTIM::Image<type_pixels>& f){
     }
 }
 
-bool TreeOfShape::is_in_image(LibTIM::Point<LibTIM::TCoord>& p){
+bool TreeOfShape32::is_in_image(LibTIM::Point<LibTIM::TCoord>& p){
     LibTIM::TCoord x = p.x,y=p.y;
     if(x == 1 || y == 1 || x == interpolate_image_max.getSizeX()-2 || y == interpolate_image_max.getSizeY()-2){
         return false;
@@ -317,7 +298,7 @@ bool TreeOfShape::is_in_image(LibTIM::Point<LibTIM::TCoord>& p){
     return (x%4) == 0 && (y%4) == 0;
 }
 
-std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point<LibTIM::TCoord>& p){
+std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape32::liste_fils(LibTIM::Point<LibTIM::TCoord>& p){
     std::vector<LibTIM::Point<LibTIM::TCoord>> result;
 
     for(int i=0;i<interpolate_image_min.getSizeX();i++){
@@ -335,7 +316,7 @@ std::vector<LibTIM::Point<LibTIM::TCoord>> TreeOfShape::liste_fils(LibTIM::Point
 }
 
 
-void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
+void TreeOfShape32::un_interpolate(LibTIM::Image<pixels32> &f){
     for(unsigned i=0;i<R.size();i++){
         LibTIM::Point<LibTIM::TCoord> p = R[i];
         if(is_in_image(p)){
@@ -391,7 +372,7 @@ void TreeOfShape::un_interpolate(LibTIM::Image<type_pixels> &f){
     parent = parent_clean;
 }
 
-void TreeOfShape::saveGraphe(const std::string& path) const{
+void TreeOfShape32::saveGraphe(const std::string& path) const{
     //On ouvre le fichier en lecture
     std::ofstream file(path,std::ios::out | std::ios::trunc);
 
@@ -408,7 +389,7 @@ void TreeOfShape::saveGraphe(const std::string& path) const{
     }
 }
 
-void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
+void TreeOfShape32::compute_area(LibTIM::Image<pixels32> &f){
     area.resize(image.getSizeX());
     for(int i=0;i<image.getSizeX();i++){
         area[i].resize(image.getSizeY());
@@ -435,9 +416,9 @@ void TreeOfShape::compute_area(LibTIM::Image<type_pixels> &f){
 }
 
 
-void TreeOfShape::removeShape(int seuil){
+void TreeOfShape32::removeShape(int seuil){
 
-    Image<type_pixels> newImage = Image<type_pixels>(image.getSizeX(),image.getSizeY());
+    Image<pixels32> newImage = Image<pixels32>(image.getSizeX(),image.getSizeY());
 
     for(int i=0;i<image.getSizeX();i++){
         for(int j=0;j<image.getSizeY();j++){
@@ -450,10 +431,9 @@ void TreeOfShape::removeShape(int seuil){
         }
     }
 
-    newImage.save("../resultRemoveShape.pgm");
 }
 
-type_pixels TreeOfShape::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
+pixels32 TreeOfShape32::couleurParent(LibTIM::Point<TCoord> &p, int seuil){
 
     LibTIM::Point<TCoord> pp = parent[p.x][p.y];
 

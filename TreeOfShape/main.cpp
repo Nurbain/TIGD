@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
 
     tree.removeShape(20000);
 
-    /*colorTreeOfShape c_tree("../JeuxTest2.ppm");
+    colorTreeOfShape c_tree("../petite_Lena.ppm");
 
     c_tree.treeMerge.saveGraphe("../result.gv");
 
-    c_tree.removeShape(50);*/
+    c_tree.removeShape(500);
 
 
     return a.exec();

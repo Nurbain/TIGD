@@ -4,7 +4,7 @@
 #include "Common/Image.h"
 
 using namespace LibTIM;
-using type_pixels = LibTIM::U8;
+using type_pixels = LibTIM::U16;
 
 class TreeOfShape
 {
@@ -23,6 +23,13 @@ public:
     void removeShape(int seuil);
 
 private:
+
+    bool is_empty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q);
+    void next_unempty(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l);
+    LibTIM::Point<LibTIM::TCoord> priority_pop(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,type_pixels& l);
+    void priority_push(std::vector<std::queue<LibTIM::Point<LibTIM::TCoord>>>& q,LibTIM::Point<LibTIM::TCoord> h,LibTIM::Image<type_pixels>& im_min,LibTIM::Image<type_pixels>& im_max,type_pixels& l);
+    std::vector<LibTIM::Point<LibTIM::TCoord>> get_voisinage(LibTIM::Point<LibTIM::TCoord>& p,LibTIM::Image<type_pixels>& im);
+    LibTIM::Point<LibTIM::TCoord> find_root(std::vector<std::vector<LibTIM::Point<LibTIM::TCoord>>>& zpar,LibTIM::Point<LibTIM::TCoord>& x);
     type_pixels median;
 
     LibTIM::Image<type_pixels> interpolate_image_min;

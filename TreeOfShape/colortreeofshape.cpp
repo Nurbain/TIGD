@@ -38,9 +38,9 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
     treeB = TreeOfShape(imageB);
     Gradient g;
 
-    Image<type_pixels> gradientR = g.Sobel(imageR);
-    Image<type_pixels> gradientG = g.Sobel(imageG);
-    Image<type_pixels> gradientB = g.Sobel(imageB);
+    Image<result_type> gradientR = g.Sobel(imageR);
+    Image<result_type> gradientG = g.Sobel(imageG);
+    Image<result_type> gradientB = g.Sobel(imageB);
 
     gradientR.save("../GradientRouge.pgm");
     gradientG.save("../GradientVert.pgm");
@@ -52,7 +52,7 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
     aireR.setSize(imageR.getSizeX(),imageR.getSizeY(),1);
     for(int i=0;i<aireR.getSizeX();i++){
         for(int j=0;j<aireR.getSizeY();j++){
-            aireR(i,j) = treeR.area[i][j];
+             aireR(i,j) = treeR.area[i][j];
         }
     }
 
@@ -98,6 +98,8 @@ colorTreeOfShape::colorTreeOfShape(const char *filename)
             }
         }
     }
+
+    imageMerge.save("../aireM.pgm");
 
     treeMerge = TreeOfShape(imageMerge);
 

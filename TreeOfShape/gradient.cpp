@@ -1,6 +1,6 @@
 #include "gradient.h"
 
-Image<type_pixels> Gradient::Sobel(const Image<type_pixels>& img){
+Image<result_type> Gradient::Sobel(const Image<type_pixels>& img){
     int Sobel3x[9]={-1,0,1,
                         -2,0,2,
                         -1,0,1};
@@ -9,7 +9,7 @@ Image<type_pixels> Gradient::Sobel(const Image<type_pixels>& img){
     int Sobel3y[9]={-1,-2,-1,
                         0,0,0,
                         1,2,1};
-    Image<type_pixels> result = Image<type_pixels>(img.getSizeX(),img.getSizeY());
+    Image<result_type> result = Image<result_type>(img.getSizeX(),img.getSizeY());
 
     int n = 1,size=3;
     for(uint i=0;i<result.getSizeX();i++){

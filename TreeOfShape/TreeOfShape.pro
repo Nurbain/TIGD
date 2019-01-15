@@ -20,9 +20,11 @@ SOURCES += \
         main.cpp \
     treeofshape.cpp \
     gradient.cpp \
-    colortreeofshape.cpp
+    colortreeofshape.cpp \
+    treeofshape32.cpp
 
 HEADERS += \
     treeofshape.h \
     gradient.h \
-    colortreeofshape.h
+    colortreeofshape.h \
+    treeofshape32.h
